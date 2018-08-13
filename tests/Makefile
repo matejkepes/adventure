@@ -13,7 +13,7 @@ endif
 
 TARGET = tests
 
-SRC = command.c
+SRC = command.c item.c
 TEST_SRC = tests.c
 
 SRC_OBJ = $(patsubst %.c,obj/%.o,$(SRC)) 
