@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <string.h>
 #include "command.h"
 
 static void test_create_command(void ** state)
@@ -10,6 +11,7 @@ static void test_create_command(void ** state)
     struct command * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
 
     assert_true(command->nmatch == (size_t) 0);
+    assert_true(strcmp(command->name, "TEST_COMMAND") == 0);
 }
 
 int main(void) 
