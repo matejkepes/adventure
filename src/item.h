@@ -15,11 +15,11 @@ enum properties{
 /**
  * Game item
  */
-struct item{
+typedef struct ITEM_STRUCT {
     char*         name;         /// item name
     char*         description;  /// item description
     unsigned int  properties;   /// item properties
-};
+} ITEM;
 
 
 /**
@@ -33,7 +33,7 @@ struct item{
  * @param properties item properties
  * @return Reference to the newly created item or NULL, if item could not be created.
  */
-struct item* create_item(char* name, char* description, unsigned int properties);
+ITEM *create_item(char* name, char* description, unsigned int properties);
 
 
 /**
@@ -44,6 +44,6 @@ struct item* create_item(char* name, char* description, unsigned int properties)
  * @param item item to destroy
  * @return Always returns NULL.
  */
-struct item* destroy_item(struct item* item);
+ITEM *destroy_item(ITEM *item);
 
 #endif

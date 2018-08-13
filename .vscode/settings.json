@@ -1,7 +1,10 @@
 {
     "files.associations": {
-        "typeindex": "c",
-        "typeinfo": "c",
-        "string.h": "c"
+        "item.h": "c",
+        "array": "cpp",
+        "deque": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "unordered_map": "cpp"
     }
 }
