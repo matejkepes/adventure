@@ -11,6 +11,9 @@ ITEM *create_item (char *name, char *description, unsigned int properties) {
     // alloc for item->description
     item->description = strdup(description);
 
+    // set item properties
+    item->properties = properties;
+    
     return item;
 }
 
