@@ -5,7 +5,11 @@ INCLUDE_DIRS += -I$(CMOCKA_DIR)/include
 
 CFLAGS	= $(INCLUDE_DIRS)
 
+ifeq ($(UNAME), Linux)
+LDFLAGS	= -L$(CMOCKA_DIR)/build/src -Wl,-rpath=$(CMOCKA_DIR)/build/src -lcmocka
+else
 LDFLAGS	= -L$(CMOCKA_DIR)/build/src -Wl,-rpath,$(CMOCKA_DIR)/build/src -lcmocka
+endif
 
 TARGET = tests
 

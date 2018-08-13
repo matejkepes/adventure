@@ -22,6 +22,11 @@ struct command *create_command (char *name, char *description, char *pattern, si
     }   
 
     command->nmatch = nmatch;
+    command->groups = NULL;
+
+    if(nmatch > 0) {
+        command->groups = (char ** ) malloc(sizeof(char * ) * nmatch);
+    }
 
     return command;
 }
@@ -29,9 +34,11 @@ struct command *create_command (char *name, char *description, char *pattern, si
 struct command *destroy_command (struct command *command) {
     //free name
     free(command->name);
+    command->name = NULL;
     
     //free description
     free(command->description);
+    command->description = NULL;
 
     //regfree preg
     regfree(&(command->preg));
