@@ -1,6 +1,8 @@
 #include "command.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <stddef.h>
 
 struct command *create_command (char *name, char *description, char *pattern, size_t nmatch) {
     //Alloc for command struct
@@ -18,6 +20,8 @@ struct command *create_command (char *name, char *description, char *pattern, si
         printf("Could not compile regex\n");
         exit(1);
     }   
+
+    command->nmatch = nmatch;
 
     return command;
 }
@@ -38,4 +42,6 @@ struct command *destroy_command (struct command *command) {
     }
 
     free(command->groups);
+
+    return NULL;
 }
