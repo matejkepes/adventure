@@ -1,6 +1,8 @@
 #include "command.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <stddef.h>
 
 struct command *create_command (char *name, char *description, char *pattern, size_t nmatch) {
     //Alloc for command struct
@@ -19,15 +21,24 @@ struct command *create_command (char *name, char *description, char *pattern, si
         exit(1);
     }   
 
+    command->nmatch = nmatch;
+    command->groups = NULL;
+
+    if(nmatch > 0) {
+        command->groups = (char ** ) malloc(sizeof(char * ) * nmatch);
+    }
+
     return command;
 }
 
 struct command *destroy_command (struct command *command) {
     //free name
     free(command->name);
+    command->name = NULL;
     
     //free description
     free(command->description);
+    command->description = NULL;
 
     //regfree preg
     regfree(&(command->preg));
@@ -38,4 +49,6 @@ struct command *destroy_command (struct command *command) {
     }
 
     free(command->groups);
+
+    return NULL;
 }
