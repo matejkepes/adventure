@@ -73,7 +73,7 @@ void show_room(const struct room* room);
  * @param room where to search
  * @param item pointer to the item to delete from room
  */
-void delete_item_from_room(struct room* room, struct item* item);
+void delete_item_from_room(struct room* room, ITEM * item);
 
 
 /**
@@ -82,7 +82,7 @@ void delete_item_from_room(struct room* room, struct item* item);
  * Function adds an item specified by it's reference to the list of items of
  * given room. The item could be added in no particular order.
  */
-void add_item_to_room(struct room* room, struct item* item);
+void add_item_to_room(struct room* room, ITEM * item);
 
 
 /**
@@ -95,6 +95,6 @@ void add_item_to_room(struct room* room, struct item* item);
  * @param name name of item to search for
  * @return Returns reference to the founded item or NULL if item was not found.
  */
-struct item* get_item_from_room(const struct room* room, const char* name);
+ITEM * get_item_from_room(const struct room* room, const char* name);
 
 #endif

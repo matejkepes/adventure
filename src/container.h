@@ -14,7 +14,7 @@
  * types: ROOM, ITEM, COMMAND or TEXT.
  */
 enum container_type {
-    ROOM, ITEM, COMMAND, TEXT
+    TYPE_ROOM, TYPE_ITEM, TYPE_COMMAND, TYPE_TEXT
 };
 
 
@@ -29,7 +29,7 @@ struct container {
     enum container_type type;       /// type of container
     union{
         struct room*    room;       /// pointer to room
-        struct item*    item;       /// pointer to item
+        ITEM *    item;       /// pointer to item
         struct command* command;    /// pointer to command
         char*           text;       /// pointer to text
     };

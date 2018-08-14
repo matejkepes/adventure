@@ -33,7 +33,7 @@ typedef struct ITEM_STRUCT {
  * @param properties item properties
  * @return Reference to the newly created item or NULL, if item could not be created.
  */
-ITEM *create_item(char* name, char* description, unsigned int properties);
+ITEM * create_item(char* name, char* description, unsigned int properties);
 
 
 /**
