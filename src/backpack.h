@@ -9,11 +9,11 @@
 /**
  * Structure representing the backpack
  */
-struct backpack {
+typedef struct BACKPACK_STRUCT {
     int capacity;               /// backpack capacity (max nr. of items)
     int size;                   /// current size
     struct container* items;    /// list of items
-};
+} BACKPACK;
 
 
 /**
@@ -21,7 +21,7 @@ struct backpack {
  * @param capacity backpack capacity
  * @return Reference to created backpack.
  */
-struct backpack* create_backpack(const int capacity);
+BACKPACK *create_backpack(const int capacity);
 
 
 /**
@@ -29,7 +29,7 @@ struct backpack* create_backpack(const int capacity);
  * @param backpack backpack to destroy
  * @return Always returns NULL.
  */
-struct backpack* destroy_backpack(struct backpack* backpack);
+BACKPACK *destroy_backpack(BACKPACK *backpack);
 
 
 /**
@@ -38,7 +38,7 @@ struct backpack* destroy_backpack(struct backpack* backpack);
  * @param item
  * @return true, if item was added successfully, false otherwise (backpack is full)
  */
-bool add_item_to_backpack(struct backpack* backpack, struct item* item);
+bool add_item_to_backpack(BACKPACK *backpack, ITEM *item);
 
 
 /**
@@ -46,7 +46,7 @@ bool add_item_to_backpack(struct backpack* backpack, struct item* item);
  * @param backpack backpack, from which the item will be deleted
  * @param item item to delete
  */
-void delete_item_from_backpack(struct backpack* backpack, struct item* item);
+void delete_item_from_backpack(BACKPACK *backpack, ITEM *item);
 
 
 /**
@@ -55,6 +55,6 @@ void delete_item_from_backpack(struct backpack* backpack, struct item* item);
  * @param name name of item to get
  * @return Reference to the item, if found, NULL otherwise.
  */
-struct item* get_item_from_backpack(const struct backpack* backpack, char* name);
+ITEM *get_item_from_backpack(const BACKPACK *backpack, char* name);
 
 #endif
