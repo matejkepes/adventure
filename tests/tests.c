@@ -14,8 +14,8 @@ static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void ** 
     COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
 
     assert_true(command->nmatch == (size_t) 0);
-    assert_true(strcmp(command->name, "TEST_COMMAND") == 0);
-    assert_true(strcmp(command->description, "TEST_COMMAND_DESC") == 0);
+    assert_string_equal(command->name, "TEST_COMMAND");
+    assert_string_equal(command->description, "TEST_COMMAND_DESC");
     assert_true(command->groups == NULL);
 }
 
@@ -24,8 +24,8 @@ static void createCommand_withMatches_returnsCommandsWithGroupsNotNull(void ** s
     COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 5);
 
     assert_true(command->nmatch == (size_t) 5);
-    assert_true(strcmp(command->name, "TEST_COMMAND") == 0);
-    assert_true(strcmp(command->description, "TEST_COMMAND_DESC") == 0);
+    assert_string_equal(command->name, "TEST_COMMAND");
+    assert_string_equal(command->description, "TEST_COMMAND_DESC");
     assert_true(command->groups != NULL);
 }
 
@@ -47,8 +47,8 @@ static void createItem_allocatedProperly(void ** state)
 {
     ITEM * item = create_item("SWORD", "MIGHTY SWORD", 0x0000);
 
-    assert_true(strcmp(item->name, "SWORD") == 0);
-    assert_true(strcmp(item->description, "MIGHTY SWORD") == 0);
+    assert_string_equal(item->name, "SWORD");
+    assert_string_equal(item->description, "MIGHTY SWORD");
     assert_true(item->properties == 0x0000);
 }
 
@@ -66,6 +66,7 @@ static void createContainer_firstItemNull_returnsNewContainer(void ** state) {
     assert_true(container != NULL);
     assert_true(container->next == NULL);
     assert_true(container->type == TYPE_ITEM);
+    assert_ptr_equal(container->item, item);
 }
 
 static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(void ** state) {
