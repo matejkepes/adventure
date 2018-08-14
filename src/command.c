@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stddef.h>
 
-struct command *create_command (char *name, char *description, char *pattern, size_t nmatch) {
+COMMAND *create_command (char *name, char *description, char *pattern, size_t nmatch) {
     //Alloc for command struct
-    struct command *command = malloc(sizeof(struct command));
+    COMMAND *command = malloc(sizeof(COMMAND));
    
     //Alloc for command->name
     command->name = strdup(name);
@@ -31,7 +31,7 @@ struct command *create_command (char *name, char *description, char *pattern, si
     return command;
 }
 
-struct command *destroy_command (struct command *command) {
+COMMAND *destroy_command (COMMAND *command) {
     //free name
     free(command->name);
     command->name = NULL;

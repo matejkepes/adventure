@@ -6,13 +6,13 @@
 /**
  * Struct defining command
  */
-struct command{
+typedef struct COMMAND_STRUCT {
     char*   name;           /// command name, must be unique
     char*   description;    /// command description
     regex_t preg;           /// precompiled pattern buffer
     size_t  nmatch;         /// number of matches
     char**  groups;         /// matched groups
-};
+} COMMAND;
 
 
 /**
@@ -31,7 +31,7 @@ struct command{
  * @param nmatch the number of groups which can be matched with regexp usage
  * @return The reference of the command in memory or NULL, if command could not be created or name or description were not provided.
  */
-struct command* create_command(char* name, char* description, char* pattern, size_t nmatch);
+COMMAND *create_command(char* name, char* description, char* pattern, size_t nmatch);
 
 
 /**
@@ -41,6 +41,6 @@ struct command* create_command(char* name, char* description, char* pattern, siz
  * @param command command to be destroyed
  * @return Always returns NULL.
  */
-struct command* destroy_command(struct command* command);
+COMMAND *destroy_command(COMMAND *command);
 
 #endif
