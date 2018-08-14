@@ -74,6 +74,7 @@ static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(vo
     ITEM * itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     struct container * first = (struct container * ) malloc(sizeof(struct container));
     first->item = itemOne;
+    first->next = NULL;
 
     //  After setup
     //  ############
@@ -100,6 +101,37 @@ static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(vo
     
 }
 
+static void destroyContainers_NULLAsFirst_returnsNull(void ** state) {
+    struct container * destroyed = destroy_containers(NULL);
+
+    assert_null(destroyed);
+}
+
+static void destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed(void ** state) {
+    //SETUP
+    ITEM * itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM * itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM * itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
+    
+    struct container * first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container * second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container * third = create_container(second, TYPE_ITEM, itemThree);
+
+    //TEST
+    struct container * destroyed = destroy_containers(third);
+
+    //ASSERT
+    assert_null(destroyed);
+    assert_null(first->item);
+    assert_null(second->item);
+    assert_null(third->item);
+    assert_null(itemOne->name);
+    assert_null(itemTwo->name);
+    assert_null(itemThree->name);
+}
+
+
+
 int main(void) 
 {
     const struct CMUnitTest tests[] = {
@@ -108,7 +140,9 @@ int main(void)
         cmocka_unit_test(test_destroy_command),
         cmocka_unit_test(createItem_allocatedProperly),
         cmocka_unit_test(createContainer_firstItemNull_returnsNewContainer),
-        cmocka_unit_test(createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead)
+        cmocka_unit_test(createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead),
+        cmocka_unit_test(destroyContainers_NULLAsFirst_returnsNull),
+        cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed)
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

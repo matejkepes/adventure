@@ -5,32 +5,35 @@
 struct container* create_container(struct container* first, enum container_type type, void* entry) 
 {
     struct container *container = malloc(sizeof(container));
-
-    container->next = NULL;
+    container->next = first;
     container->type = type;
     
     if (container->type == TYPE_ROOM) {
-        container->room = strdup(entry);
+        container->room = (struct room * ) entry;
     } 
 
     if (container->type == TYPE_ITEM) {
-        container->item = strdup(entry);
+        container->item = (ITEM *) entry;
     }
 
     if (container->type == TYPE_COMMAND) {
-        container->command = strdup(entry);
+        container->command = (COMMAND * ) entry;
     }
 
     if (container->type == TYPE_TEXT) {
-        container->text = strdup(entry);
+        container->text =  (char * ) entry;
     }
     
-    return first;
+    return container;
 }
 
 struct container* destroy_containers(struct container* first) 
 {
+    if(first == NULL)
+        return NULL;
 
+    destroy_item(first->item);
+    return NULL;
 }
 
 
