@@ -9,7 +9,7 @@
 
 static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void ** state)
 {
-    struct command * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
+    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
 
     assert_true(command->nmatch == (size_t) 0);
     assert_true(strcmp(command->name, "TEST_COMMAND") == 0);
@@ -19,7 +19,7 @@ static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void ** 
 
 static void createCommand_withMatches_returnsCommandsWithGroupsNotNull(void ** state)
 {
-    struct command * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 5);
+    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 5);
 
     assert_true(command->nmatch == (size_t) 5);
     assert_true(strcmp(command->name, "TEST_COMMAND") == 0);
@@ -30,7 +30,7 @@ static void createCommand_withMatches_returnsCommandsWithGroupsNotNull(void ** s
 static void test_destroy_command(void ** state)
 {
     //SETUP
-    struct command * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
+    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
 
     //TEST
     destroy_command(command);
