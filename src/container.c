@@ -1,8 +1,31 @@
 #include "container.h"
+#include <stdlib.h>
+#include <string.h>
 
 struct container* create_container(struct container* first, enum container_type type, void* entry) 
 {
+    struct container *container = malloc(sizeof(container));
+
+    container->next = NULL;
+    container->type = type;
     
+    if (container->type == TYPE_ROOM) {
+        container->room = strdup(entry);
+    } 
+
+    if (container->type == TYPE_ITEM) {
+        container->item = strdup(entry);
+    }
+
+    if (container->type == TYPE_COMMAND) {
+        container->command = strdup(entry);
+    }
+
+    if (container->type == TYPE_TEXT) {
+        container->text = strdup(entry);
+    }
+    
+    return first;
 }
 
 struct container* destroy_containers(struct container* first) 
