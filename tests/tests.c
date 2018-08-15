@@ -137,7 +137,8 @@ static void getFromContainer_ListNullReturnsNull(void **state)
     assert_null(get_from_container_by_name(NULL, "WHATEVER"));
 }
 
-static void getFromContainer_ListContainsItem_ItemRetrieved(void ** state) {
+static void getFromContainer_ListContainsItem_ItemRetrieved(void **state)
+{
     //SETUP
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
@@ -153,6 +154,109 @@ static void getFromContainer_ListContainsItem_ItemRetrieved(void ** state) {
     assert_ptr_equal(get_from_container_by_name(third, "ITEM_THREE"), third);
 }
 
+int get_linked_list_size(struct container *container)
+{
+    if (container == NULL)
+        return 0;
+
+    int size;
+    struct container *head = container;
+
+    for (size = 0; head != NULL; head = head->next, size++)
+        ;
+
+    return size;
+}
+
+struct container *get_nth_item_from_linked_list(struct container *container, int n)
+{
+    if (container == NULL || n < 0)
+        return NULL;
+
+    int index;
+    struct container *head = container;
+
+    for (index = 0; head != NULL; head = head->next, index++)
+    {
+        if (index == n)
+            return head;
+    }
+
+    return NULL;
+}
+
+static void removeContainer__ListNullEntryNull__returnsNull(void **state)
+{
+    assert_null(remove_container(NULL, NULL));
+}
+
+static void removeContainer__ListNullEntryNotNull__returnsNull(void **state)
+{
+    assert_null(remove_container(NULL, create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000)));
+}
+
+static void removeContainer__EntryNull__returnsUnchagedList(void **state)
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    assert_ptr_equal(first, remove_container(first, NULL));
+}
+
+static void removeContainer__EntryNotInList_returnsReferenceListUnchanged(void **state)
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+
+    assert_ptr_equal(first, remove_container(first, itemTwo));
+}
+
+static void removeContainer__EntryInList__returnsReferenceListChanged(void **state)
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
+
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container *second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container *third = create_container(second, TYPE_ITEM, itemThree);
+
+    struct container *afterFirstItemRemoved = remove_container(third, itemOne);
+    assert_int_equal(2, get_linked_list_size(afterFirstItemRemoved));
+
+    struct container *afterSecondItemRemoved = remove_container(afterFirstItemRemoved, itemTwo);
+    assert_int_equal(1, get_linked_list_size(afterSecondItemRemoved));
+
+    struct container *afterThirdItemRemoved = remove_container(afterSecondItemRemoved, itemThree);
+    assert_int_equal(0, get_linked_list_size(afterThirdItemRemoved));
+}
+
+static void removeContainer__EntryInListListOfSizeOne_returnsNull(void **state)
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    assert_null(remove_container(first, itemOne));
+}
+
+//list empty test, entry empty
+//list empty test, entry not empty
+
+//list not empty, entry empty
+//list not empty, entry not empty
+//
+
+static void removeFromContainer_ListNotEmpty_ItemRemovedProperly(void **state)
+{
+    //SETUP
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
+
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container *second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container *third = create_container(second, TYPE_ITEM, itemThree);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -165,8 +269,13 @@ int main(void)
         cmocka_unit_test(destroyContainers_NULLAsFirst_returnsNull),
         cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed),
         cmocka_unit_test(getFromContainer_ListNullReturnsNull),
-        cmocka_unit_test(getFromContainer_ListContainsItem_ItemRetrieved)
-        };
+        cmocka_unit_test(getFromContainer_ListContainsItem_ItemRetrieved),
+        cmocka_unit_test(removeContainer__ListNullEntryNull__returnsNull),
+        cmocka_unit_test(removeContainer__ListNullEntryNotNull__returnsNull),
+        cmocka_unit_test(removeContainer__EntryNull__returnsUnchagedList),
+        cmocka_unit_test(removeContainer__EntryNotInList_returnsReferenceListUnchanged),
+        cmocka_unit_test(removeContainer__EntryInList__returnsReferenceListChanged),
+        cmocka_unit_test(removeContainer__EntryInListListOfSizeOne_returnsNull)};
 
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
