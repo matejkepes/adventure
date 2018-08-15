@@ -2,3 +2,4 @@ cmocka-1.1.1/build
 tests/obj
 tests/cmocka
 tests/tests
+.vscode
