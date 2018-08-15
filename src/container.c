@@ -119,4 +119,90 @@ void *get_from_container_by_name(struct container *first, const char *name)
  */
 struct container *remove_container(struct container *first, void *entry)
 {
+    struct container *cursor = first;
+    struct container * previous = NULL;
+
+    if (entry == NULL) {
+        return first;
+    }
+
+    while(cursor != NULL) {
+
+        if (cursor->type == TYPE_ITEM)
+        {
+            if (cursor->item == entry) {
+                if (cursor == first) {
+                    struct container *tmp = first->next;
+                    first->next = NULL;
+                    return first->next;
+                } else {
+                    //Middle or last
+
+                    previous->next = cursor->next;
+                    cursor->next = NULL;
+
+                    return first;
+                }
+            }  
+        }
+
+        if (cursor->type == TYPE_COMMAND)
+        {
+            if (cursor->command == entry) {
+                if (cursor == first) {
+                    struct container *tmp = first->next;
+                    first->next = NULL;
+                    return first->next;
+                } else {
+                    //Middle or last
+
+                    previous->next = cursor->next;
+                    cursor->next = NULL;
+
+                    return first;
+                }
+            } 
+        }
+
+        if (cursor->type == TYPE_ROOM)
+        {
+            if (cursor->room == entry) {
+                if (cursor == first) {
+                    struct container *tmp = first->next;
+                    first->next = NULL;
+                    return first->next;
+                } else {
+                    //Middle or last
+
+                    previous->next = cursor->next;
+                    cursor->next = NULL;
+
+                    return first;
+                }
+            } 
+        }
+
+        if (cursor->type == TYPE_TEXT)
+        {
+            if (cursor->text == entry) {
+                if (cursor == first) {
+                    struct container *tmp = first->next;
+                    first->next = NULL;
+                    return first->next;
+                } else {
+                    //Middle or last
+
+                    previous->next = cursor->next;
+                    cursor->next = NULL;
+
+                    return first;
+                }
+            } 
+        }
+
+        previous = cursor;
+        cursor = cursor->next;
+    }
+
+    return first;
 }

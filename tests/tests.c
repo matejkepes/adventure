@@ -248,7 +248,7 @@ static void removeContainer_EntryInMiddle_ReturnsReferenceListChanged(void ** st
     struct container *second = create_container(first, TYPE_ITEM, itemTwo);
     struct container *third = create_container(second, TYPE_ITEM, itemThree);
 
-    struct container * afterItemInTheMiddleRemoved = remove_container(third, second);
+    struct container * afterItemInTheMiddleRemoved = remove_container(third, itemTwo);
 
     assert_int_equal(2, get_linked_list_size(afterItemInTheMiddleRemoved));
     assert_ptr_equal(third, get_nth_item_from_linked_list(afterItemInTheMiddleRemoved, 0));
