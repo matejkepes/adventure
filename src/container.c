@@ -71,20 +71,40 @@ struct container *destroy_containers(struct container *first)
     return NULL;
 }
 
-/**
- * Returns container content based on it's name
- *
- * Function returns container content of specific type based on it's name. So it
- * returns command object based on the command name, or item object based on the
- * item name, or room object based on the room name, or text entry if such entry
- * exists. Search pattern is not case sensitive. If such object doesn't exist,
- * NULL is returned.
- * @param first pointer to the first container of the list
- * @param name search pattern
- * @return Reference to the founded object or NULL, if the object was not found.
- */
 void *get_from_container_by_name(struct container *first, const char *name)
 {
+    struct container *cursor = first;
+
+    while(cursor != NULL){
+
+        if (cursor->type == TYPE_ITEM)
+        {
+            if(strcmp(cursor->item->name, name) == 0)
+                return cursor;
+        }
+
+        if (cursor->type == TYPE_COMMAND)
+        {
+            if(strcmp(cursor->command->name, name) == 0)
+                return cursor;
+        }
+
+        if (cursor->type == TYPE_ROOM)
+        {
+            if(strcmp(cursor->room->name, name) == 0)
+                return cursor;
+        }
+
+        if (cursor->type == TYPE_TEXT)
+        {
+            if(strcmp(cursor->text, name) == 0)
+                return cursor;
+        }
+        
+
+        return NULL;
+
+    }
 }
 
 /**
