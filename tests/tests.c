@@ -156,14 +156,14 @@ static void getFromContainer_ListContainsItem_ItemRetrieved(void ** state) {
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        // cmocka_unit_test(createCommand_noMatches_returnsCommandsWithGroupsEqualsNull),
-        // cmocka_unit_test(createCommand_withMatches_returnsCommandsWithGroupsNotNull),
-        // cmocka_unit_test(test_destroy_command),
-        // cmocka_unit_test(createItem_allocatedProperly),
-        // cmocka_unit_test(createContainer_firstItemNull_returnsNewContainer),
-        // cmocka_unit_test(createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead),
-        // cmocka_unit_test(destroyContainers_NULLAsFirst_returnsNull),
-        // cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed),
+        cmocka_unit_test(createCommand_noMatches_returnsCommandsWithGroupsEqualsNull),
+        cmocka_unit_test(createCommand_withMatches_returnsCommandsWithGroupsNotNull),
+        cmocka_unit_test(test_destroy_command),
+        cmocka_unit_test(createItem_allocatedProperly),
+        cmocka_unit_test(createContainer_firstItemNull_returnsNewContainer),
+        cmocka_unit_test(createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead),
+        cmocka_unit_test(destroyContainers_NULLAsFirst_returnsNull),
+        cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed),
         cmocka_unit_test(getFromContainer_ListNullReturnsNull),
         cmocka_unit_test(getFromContainer_ListContainsItem_ItemRetrieved)
         };

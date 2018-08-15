@@ -101,10 +101,9 @@ void *get_from_container_by_name(struct container *first, const char *name)
                 return cursor;
         }
         
-
-        return NULL;
-
+        cursor = cursor->next;
     }
+        return NULL;
 }
 
 /**
