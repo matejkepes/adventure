@@ -238,6 +238,23 @@ static void removeContainer__EntryInListListOfSizeOne_returnsNull(void **state)
     assert_null(remove_container(first, itemOne));
 }
 
+static void removeContainer_EntryInMiddle_ReturnsReferenceListChanged(void ** state) 
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
+
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container *second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container *third = create_container(second, TYPE_ITEM, itemThree);
+
+    struct container * afterItemInTheMiddleRemoved = remove_container(third, second);
+
+    assert_int_equal(2, get_linked_list_size(afterItemInTheMiddleRemoved));
+    assert_ptr_equal(third, get_nth_item_from_linked_list(afterItemInTheMiddleRemoved, 0));
+    assert_ptr_equal(first, get_nth_item_from_linked_list(afterItemInTheMiddleRemoved, 1));
+}
+
 //list empty test, entry empty
 //list empty test, entry not empty
 
@@ -275,7 +292,9 @@ int main(void)
         cmocka_unit_test(removeContainer__EntryNull__returnsUnchagedList),
         cmocka_unit_test(removeContainer__EntryNotInList_returnsReferenceListUnchanged),
         cmocka_unit_test(removeContainer__EntryInList__returnsReferenceListChanged),
-        cmocka_unit_test(removeContainer__EntryInListListOfSizeOne_returnsNull)};
+        cmocka_unit_test(removeContainer__EntryInListListOfSizeOne_returnsNull),
+        cmocka_unit_test(removeContainer_EntryInMiddle_ReturnsReferenceListChanged)
+        };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
