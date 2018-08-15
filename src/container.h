@@ -30,7 +30,7 @@ struct container {
     union{
         struct room*    room;       /// pointer to room
         ITEM *    item;       /// pointer to item
-        struct command* command;    /// pointer to command
+        COMMAND* command;    /// pointer to command
         char*           text;       /// pointer to text
     };
     struct container* next;         /// pointer to next data container in list

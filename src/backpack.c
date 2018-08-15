@@ -25,13 +25,13 @@ BACKPACK *destroy_backpack(BACKPACK *backpack) {
 }
 
 bool add_item_to_backpack(BACKPACK *backpack, ITEM *item) {
-        if (backpack->size < backpack->capacity) {
+/*         if (backpack->size < backpack->capacity) {
             backpack->items = item;
             backpack->size++;
             return true;
         } else {
             return false;
-        }
+        } */
 }
 
 void delete_item_from_backpack(BACKPACK *backpack, ITEM *item) {
