@@ -9,30 +9,30 @@
 #include "item.h"
 #include "container.h"
 
-static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void ** state)
+static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void **state)
 {
-    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
+    COMMAND *command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t)0);
 
-    assert_true(command->nmatch == (size_t) 0);
+    assert_true(command->nmatch == (size_t)0);
     assert_string_equal(command->name, "TEST_COMMAND");
     assert_string_equal(command->description, "TEST_COMMAND_DESC");
     assert_true(command->groups == NULL);
 }
 
-static void createCommand_withMatches_returnsCommandsWithGroupsNotNull(void ** state)
+static void createCommand_withMatches_returnsCommandsWithGroupsNotNull(void **state)
 {
-    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 5);
+    COMMAND *command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t)5);
 
-    assert_true(command->nmatch == (size_t) 5);
+    assert_true(command->nmatch == (size_t)5);
     assert_string_equal(command->name, "TEST_COMMAND");
     assert_string_equal(command->description, "TEST_COMMAND_DESC");
     assert_true(command->groups != NULL);
 }
 
-static void test_destroy_command(void ** state)
+static void test_destroy_command(void **state)
 {
     //SETUP
-    COMMAND * command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t) 0);
+    COMMAND *command = create_command("TEST_COMMAND", "TEST_COMMAND_DESC", ".*", (size_t)0);
 
     //TEST
     destroy_command(command);
@@ -40,22 +40,22 @@ static void test_destroy_command(void ** state)
     //Assertion
     assert_true(command->name == NULL);
     assert_true(command->description == NULL);
-}   
+}
 
-
-static void createItem_allocatedProperly(void ** state) 
+static void createItem_allocatedProperly(void **state)
 {
-    ITEM * item = create_item("SWORD", "MIGHTY SWORD", 0x0000);
+    ITEM *item = create_item("SWORD", "MIGHTY SWORD", 0x0000);
 
     assert_string_equal(item->name, "SWORD");
     assert_string_equal(item->description, "MIGHTY SWORD");
     assert_true(item->properties == 0x0000);
 }
 
-static void createContainer_firstItemNull_returnsNewContainer(void ** state) {
-    ITEM * item = create_item("SWORD", "MIGHTY SWORD", 0x0000);
-    struct container * container = NULL;
-    
+static void createContainer_firstItemNull_returnsNewContainer(void **state)
+{
+    ITEM *item = create_item("SWORD", "MIGHTY SWORD", 0x0000);
+    struct container *container = NULL;
+
     container = create_container(NULL, TYPE_ITEM, item);
 
     //  State we're testing for
@@ -69,10 +69,11 @@ static void createContainer_firstItemNull_returnsNewContainer(void ** state) {
     assert_ptr_equal(container->item, item);
 }
 
-static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(void ** state) {
+static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(void **state)
+{
     //Setup first container item
-    ITEM * itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
-    struct container * first = (struct container * ) malloc(sizeof(struct container));
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    struct container *first = (struct container *)malloc(sizeof(struct container));
     first->item = itemOne;
     first->next = NULL;
 
@@ -81,13 +82,13 @@ static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(vo
     //  # ITEM_ONE # ---> NULL
     //  ############
 
-    struct container * container = NULL;
-    ITEM * itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
-    
+    struct container *container = NULL;
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+
     container = create_container(first, TYPE_ITEM, itemTwo);
 
     //  This is the state we're expecting
-    //  ############        ############        
+    //  ############        ############
     //  # ITEM_TWO #  ----> # ITEM_ONE # ---> NULL
     //  ############        ############
 
@@ -98,27 +99,28 @@ static void createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead(vo
     assert_ptr_equal(container->next->item, itemOne);
     //Assert that we only have 2 items
     assert_true(container->next->next == NULL);
-    
 }
 
-static void destroyContainers_NULLAsFirst_returnsNull(void ** state) {
-    struct container * destroyed = destroy_containers(NULL);
+static void destroyContainers_NULLAsFirst_returnsNull(void **state)
+{
+    struct container *destroyed = destroy_containers(NULL);
 
     assert_null(destroyed);
 }
 
-static void destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed(void ** state) {
+static void destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed(void **state)
+{
     //SETUP
-    ITEM * itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
-    ITEM * itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
-    ITEM * itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
-    
-    struct container * first = create_container(NULL, TYPE_ITEM, itemOne);
-    struct container * second = create_container(first, TYPE_ITEM, itemTwo);
-    struct container * third = create_container(second, TYPE_ITEM, itemThree);
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
+
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container *second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container *third = create_container(second, TYPE_ITEM, itemThree);
 
     //TEST
-    struct container * destroyed = destroy_containers(third);
+    struct container *destroyed = destroy_containers(third);
 
     //ASSERT
     assert_null(destroyed);
@@ -130,9 +132,28 @@ static void destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed(void ** 
     assert_null(itemThree->name);
 }
 
+static void getFromContainer_ListNullReturnsNull(void **state)
+{
+    assert_null(get_from_container_by_name(NULL, "WHATEVER"));
+}
 
+static void getFromContainer_ListContainsItem_ItemRetrieved(void ** state) {
+    //SETUP
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
 
-int main(void) 
+    struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
+    struct container *second = create_container(first, TYPE_ITEM, itemTwo);
+    struct container *third = create_container(second, TYPE_ITEM, itemThree);
+
+    assert_null(get_from_container_by_name(third, "ITEM_FOUR"));
+    assert_ptr_equal(get_from_container_by_name(third, "ITEM_ONE"), itemOne);
+    assert_ptr_equal(get_from_container_by_name(third, "ITEM_TWO"), itemTwo);
+    assert_ptr_equal(get_from_container_by_name(third, "ITEM_THREE"), itemThree);
+}
+
+int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(createCommand_noMatches_returnsCommandsWithGroupsEqualsNull),
@@ -142,8 +163,10 @@ int main(void)
         cmocka_unit_test(createContainer_firstItemNull_returnsNewContainer),
         cmocka_unit_test(createContainer_firstItemNotNull_returnsNewContainerItemIsNewHead),
         cmocka_unit_test(destroyContainers_NULLAsFirst_returnsNull),
-        cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed)
-    };
+        cmocka_unit_test(destroyContainers_FirstItemPassedIn_returnsNullOBjectsFreed),
+        cmocka_unit_test(getFromContainer_ListNullReturnsNull),
+        cmocka_unit_test(getFromContainer_ListContainsItem_ItemRetrieved)
+        };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
