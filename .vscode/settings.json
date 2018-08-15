@@ -6,6 +6,7 @@
         "vector": "cpp",
         "initializer_list": "cpp",
         "unordered_map": "cpp",
-        "container.h": "c"
+        "container.h": "c",
+        "stdlib.h": "c"
     }
 }
