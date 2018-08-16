@@ -390,7 +390,7 @@ static void backpack_delete_item_from_backpack_ItemNotRemoved_WhenNotInBackpack(
 
     assert_int_equal(backpack->size, 1);
     assert_int_equal(backpack->capacity, BACKPACK_CAPACITY);
-    assert_ptr_equal(backpack->items, itemOne);
+    assert_ptr_equal(backpack->items->item, itemOne);
 }
 
 static void backpack_get_item_backpackNull_returnsNull(void **state)
