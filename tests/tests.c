@@ -280,6 +280,16 @@ static void backpack_create_backpack(void **state)
     assert_null(backpack->items);
 }
 
+BACKPACK *createBackpackWithItems(int capacity, struct container *items)
+{
+    BACKPACK *backpack = malloc(sizeof(BACKPACK));
+    backpack->items = items;
+    backpack->size = get_linked_list_size(items);
+    backpack->capacity = capacity;
+
+    return backpack;
+}
+
 static void backpack_destroy_backpack_backpackNullReturnsNull(void **state)
 {
     assert_null(destroy_backpack(NULL));
@@ -287,10 +297,6 @@ static void backpack_destroy_backpack_backpackNullReturnsNull(void **state)
 
 static void backpack_destroy_backpack(void **state)
 {
-    const int BACKPACK_CAPACITY = 10;
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
-
-    //Setup list of three items
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
     ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
@@ -298,8 +304,7 @@ static void backpack_destroy_backpack(void **state)
     struct container *second = create_container(first, TYPE_ITEM, itemTwo);
     struct container *third = create_container(second, TYPE_ITEM, itemThree);
 
-    backpack->items = third;
-    backpack->size = 3;
+    BACKPACK *backpack = createBackpackWithItems(10, third);
 
     //Essentially !!! destroy_containers must be called
     assert_null(destroy_backpack(backpack));
@@ -313,9 +318,8 @@ static void backpack_destroy_backpack(void **state)
 
 static void backpack_add_item_to_backpack_returnsFalseWhenCapacity0(void **state)
 {
-    const int BACKPACK_CAPACITY = 0;
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    BACKPACK *backpack = createBackpackWithItems(0, NULL);
 
     assert_false(add_item_to_backpack(backpack, itemOne));
     assert_null(backpack->items);
@@ -324,8 +328,7 @@ static void backpack_add_item_to_backpack_returnsFalseWhenCapacity0(void **state
 
 static void backpack_add_item_to_backpack_returnsTrueWhenCapacityIsNotExceeded(void **state)
 {
-    const int BACKPACK_CAPACITY = 1;
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
+    BACKPACK *backpack = createBackpackWithItems(1, NULL);
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
 
     assert_true(add_item_to_backpack(backpack, itemOne));
@@ -335,8 +338,7 @@ static void backpack_add_item_to_backpack_returnsTrueWhenCapacityIsNotExceeded(v
 
 static void backpack_add_item_to_backpack_returnsFalseWhenMaxCapacityReached(void **state)
 {
-    const int BACKPACK_CAPACITY = 1;
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
+    BACKPACK *backpack = createBackpackWithItems(1, NULL);
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
 
@@ -363,10 +365,7 @@ static void backpack_delete_item_from_backpack_ItemRemovedWhenInBackpack(void **
 {
     const int BACKPACK_CAPACITY = 1;
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
-    backpack->size = 1;
-    backpack->capacity = BACKPACK_CAPACITY;
-    backpack->items = create_container(NULL, TYPE_ITEM, itemOne);
+    BACKPACK *backpack = createBackpackWithItems(BACKPACK_CAPACITY, create_container(NULL, TYPE_ITEM, itemOne));
 
     delete_item_from_backpack(backpack, itemOne);
     assert_int_equal(backpack->size, 0);
@@ -380,10 +379,7 @@ static void backpack_delete_item_from_backpack_ItemNotRemoved_WhenNotInBackpack(
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
 
-    BACKPACK *backpack = create_backpack(BACKPACK_CAPACITY);
-    backpack->size = 1;
-    backpack->capacity = BACKPACK_CAPACITY;
-    backpack->items = create_container(NULL, TYPE_ITEM, itemOne);
+    BACKPACK *backpack = createBackpackWithItems(BACKPACK_CAPACITY, create_container(NULL, TYPE_ITEM, itemOne));
 
     //Delete an item which is not in the backpack
     delete_item_from_backpack(backpack, itemTwo);
@@ -392,17 +388,31 @@ static void backpack_delete_item_from_backpack_ItemNotRemoved_WhenNotInBackpack(
     assert_int_equal(backpack->capacity, BACKPACK_CAPACITY);
     assert_ptr_equal(backpack->items->item, itemOne);
 }
-
-static void backpack_get_item_backpackNull_returnsNull(void **state)
+static void backpack_get_item_backpackOrNameNull_returnsNull(void **state)
 {
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    BACKPACK *backpack = createBackpackWithItems(10, create_container(NULL, TYPE_ITEM, itemOne));
+
+    assert_null(get_item_from_backpack(NULL, "ITEM"));
+    assert_null(get_item_from_backpack(backpack, NULL));
 }
 
 static void backpack_get_item_ItemNotInBackpack_returnsNull(void **state)
 {
+    const int BACKPACK_CAPACITY = 1;
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    BACKPACK *backpack = createBackpackWithItems(BACKPACK_CAPACITY, create_container(NULL, TYPE_ITEM, itemOne));
+
+    assert_null(get_item_from_backpack(backpack, "SOME_OTHER_ITEM"));
 }
 
 static void backpack_get_item_ItemInBackpack_ItemReturnedBackpackItemsIntact(void **state)
 {
+    const int BACKPACK_CAPACITY = 1;
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    BACKPACK *backpack = createBackpackWithItems(BACKPACK_CAPACITY, create_container(NULL, TYPE_ITEM, itemOne));
+
+    assert_ptr_equal(get_item_from_backpack(backpack, "ITEM_ONE"), itemOne);
 }
 
 int main(void)
@@ -447,7 +457,7 @@ int main(void)
         cmocka_unit_test(backpack_delete_item_from_backpack_ItemRemovedWhenInBackpack),
         cmocka_unit_test(backpack_delete_item_from_backpack_ItemNotRemoved_WhenNotInBackpack),
         //Backpack - Get item
-        cmocka_unit_test(backpack_get_item_backpackNull_returnsNull),
+        cmocka_unit_test(backpack_get_item_backpackOrNameNull_returnsNull),
         cmocka_unit_test(backpack_get_item_ItemNotInBackpack_returnsNull),
         cmocka_unit_test(backpack_get_item_ItemInBackpack_ItemReturnedBackpackItemsIntact),
 
