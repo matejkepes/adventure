@@ -442,6 +442,27 @@ static void Room_destroy_room(void ** state)
     assert_null(description);
 }
 
+static void Room_set_exits_from_room(void ** state) 
+{
+    struct room * room = malloc(sizeof(struct room));
+    struct room * N = malloc(sizeof(struct room));
+    struct room * S = malloc(sizeof(struct room));
+    struct room * E = malloc(sizeof(struct room));
+    struct room * W = malloc(sizeof(struct room));
+
+    set_exits_from_room(room, N, S, E, W);
+    assert_ptr_equal(room->north, N);
+    assert_ptr_equal(room->south, S);
+    assert_ptr_equal(room->east, E);
+    assert_ptr_equal(room->west, W);
+
+    set_exits_from_room(room, NULL, NULL, NULL, NULL);
+    assert_null(room->north);
+    assert_null(room->south);
+    assert_null(room->east);
+    assert_null(room->west);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -490,8 +511,9 @@ int main(void)
         //Room - Create
         cmocka_unit_test(Room_create_room),
         //Room - Destroy
-        cmocka_unit_test(Room_destroy_room)
+        cmocka_unit_test(Room_destroy_room),
         //Room - Set Exits
+        cmocka_unit_test(Room_set_exits_from_room)
         //Room - Show
         //Room - Delete item
         //Room - Add Item
