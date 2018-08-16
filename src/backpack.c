@@ -66,23 +66,12 @@ void delete_item_from_backpack(BACKPACK *backpack, ITEM *item)
 
 ITEM *get_item_from_backpack(const BACKPACK *backpack, char *name)
 {
-    if (backpack != NULL && name != NULL) {
-
+    if (backpack != NULL && name != NULL)
+    {
         struct container *tmp = get_from_container_by_name(backpack->items, name);
 
-        if (tmp != NULL) {
-            
-
-
-            return ((ITEM *) (get_from_container_by_name(backpack->items, name)));
-
-
-        } else {
-            return NULL;
-        }
-
-
-    } else {
-        return NULL;
+        return tmp == NULL ? NULL : tmp->item;
     }
+
+    return NULL;
 }

@@ -51,7 +51,7 @@ void delete_item_from_backpack(BACKPACK *backpack, ITEM *item);
 
 /**
  * Gets the item by name
- * @param bakcpack backpack to seaerch for item
+ * @param backpack backpack to search for item
  * @param name name of item to get
  * @return Reference to the item, if found, NULL otherwise.
  */
