@@ -9,6 +9,7 @@
 #include "item.h"
 #include "container.h"
 #include "backpack.h"
+#include "room.h"
 
 static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void **state)
 {
@@ -415,6 +416,32 @@ static void backpack_get_item_ItemInBackpack_ItemReturnedBackpackItemsIntact(voi
     assert_ptr_equal(get_item_from_backpack(backpack, "ITEM_ONE"), itemOne);
 }
 
+static void Room_create_room(void ** state) 
+{
+    assert_null(create_room(NULL, NULL));
+    assert_null(create_room("NAME", NULL));
+    assert_null(create_room(NULL, "DESC"));
+    
+    struct room * room = create_room("NAME", "DESC");
+    assert_string_equal(room->name, "NAME");
+    assert_string_equal(room->description, "DESC");
+}
+
+static void Room_destroy_room(void ** state) 
+{
+    char * name = "NAME";
+    char * description = "DESC";
+    struct room * room = malloc(sizeof(struct room));
+    room->name = name;
+    room->description = description;
+    
+    room = destroy_room(room);
+
+    assert_null(room);
+    assert_null(name);
+    assert_null(description);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -460,6 +487,15 @@ int main(void)
         cmocka_unit_test(backpack_get_item_backpackOrNameNull_returnsNull),
         cmocka_unit_test(backpack_get_item_ItemNotInBackpack_returnsNull),
         cmocka_unit_test(backpack_get_item_ItemInBackpack_ItemReturnedBackpackItemsIntact),
+        //Room - Create
+        cmocka_unit_test(Room_create_room),
+        //Room - Destroy
+        cmocka_unit_test(Room_destroy_room)
+        //Room - Set Exits
+        //Room - Show
+        //Room - Delete item
+        //Room - Add Item
+        //Room - Get Item
 
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
