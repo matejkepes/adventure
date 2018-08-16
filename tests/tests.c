@@ -416,25 +416,25 @@ static void backpack_get_item_ItemInBackpack_ItemReturnedBackpackItemsIntact(voi
     assert_ptr_equal(get_item_from_backpack(backpack, "ITEM_ONE"), itemOne);
 }
 
-static void Room_create_room(void ** state) 
+static void Room_create_room(void **state)
 {
     assert_null(create_room(NULL, NULL));
     assert_null(create_room("NAME", NULL));
     assert_null(create_room(NULL, "DESC"));
-    
-    struct room * room = create_room("NAME", "DESC");
+
+    struct room *room = create_room("NAME", "DESC");
     assert_string_equal(room->name, "NAME");
     assert_string_equal(room->description, "DESC");
 }
 
-static void Room_destroy_room(void ** state) 
+static void Room_destroy_room(void **state)
 {
-    char * name = "NAME";
-    char * description = "DESC";
-    struct room * room = malloc(sizeof(struct room));
+    char *name = "NAME";
+    char *description = "DESC";
+    struct room *room = malloc(sizeof(struct room));
     room->name = name;
     room->description = description;
-    
+
     room = destroy_room(room);
 
     assert_null(room);
@@ -442,13 +442,13 @@ static void Room_destroy_room(void ** state)
     assert_null(description);
 }
 
-static void Room_set_exits_from_room(void ** state) 
+static void Room_set_exits_from_room(void **state)
 {
-    struct room * room = malloc(sizeof(struct room));
-    struct room * N = malloc(sizeof(struct room));
-    struct room * S = malloc(sizeof(struct room));
-    struct room * E = malloc(sizeof(struct room));
-    struct room * W = malloc(sizeof(struct room));
+    struct room *room = malloc(sizeof(struct room));
+    struct room *N = malloc(sizeof(struct room));
+    struct room *S = malloc(sizeof(struct room));
+    struct room *E = malloc(sizeof(struct room));
+    struct room *W = malloc(sizeof(struct room));
 
     set_exits_from_room(room, N, S, E, W);
     assert_ptr_equal(room->north, N);
@@ -461,6 +461,83 @@ static void Room_set_exits_from_room(void ** state)
     assert_null(room->south);
     assert_null(room->east);
     assert_null(room->west);
+}
+
+static void Room_show(void **state)
+{
+    //Just to see if it crashes or not
+    show_room(NULL);
+}
+
+static void Room_delete_item_from_room(void **state)
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    struct container * head = create_container(NULL, TYPE_ITEM, itemOne);
+    head = create_container(head, TYPE_ITEM, itemTwo);
+
+    struct room *room = malloc(sizeof(struct room));
+    room->items = head;
+
+    delete_item_from_room(NULL, NULL);
+    delete_item_from_room(NULL, itemOne);
+    delete_item_from_room(room, NULL);
+
+    assert_ptr_equal(room->items, head);
+    
+    delete_item_from_room(room, itemTwo);
+
+    assert_ptr_equal(room->items->item, itemOne);
+
+    delete_item_from_room(room, itemOne);
+
+    assert_null(room->items);
+}
+
+static void Room_add_item_to_room(void ** state) 
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+    struct room *room = malloc(sizeof(struct room));
+
+    assert_int_equal(get_linked_list_size(room->items), 0);
+
+    add_item_to_room(room, itemOne);
+
+    assert_int_equal(get_linked_list_size(room->items), 1);
+    assert_ptr_equal(room->items->item, itemOne);
+
+    add_item_to_room(room, itemTwo);
+
+    assert_int_equal(get_linked_list_size(room->items), 2);
+    assert_ptr_equal(room->items->item, itemTwo);
+}
+
+static void Room_get_item_from_room(void ** state) 
+{
+    ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
+    ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
+
+    struct container * head;
+    head = create_container(NULL, TYPE_ITEM, itemOne);
+    head = create_container(head, TYPE_ITEM, itemTwo);
+
+    struct room *room = malloc(sizeof(struct room));
+    room->items = head;
+
+    assert_null(get_item_from_room(NULL, NULL));
+
+    assert_null(get_item_from_room(NULL, "TEST"));
+
+    assert_null(get_item_from_room(room, NULL));
+
+    assert_null(get_item_from_room(room, "ITEM_THREE"));
+
+    //Also checks if item stays in the room.
+    assert_ptr_equal(get_item_from_room(room, "ITEM_TWO"), itemTwo);
+    assert_ptr_equal(get_item_from_room(room, "ITEM_TWO"), itemTwo);
+    assert_ptr_equal(get_item_from_room(room, "ITEM_ONE"), itemOne);
+    assert_ptr_equal(get_item_from_room(room, "ITEM_ONE"), itemOne);
 }
 
 int main(void)
@@ -513,12 +590,15 @@ int main(void)
         //Room - Destroy
         cmocka_unit_test(Room_destroy_room),
         //Room - Set Exits
-        cmocka_unit_test(Room_set_exits_from_room)
+        cmocka_unit_test(Room_set_exits_from_room),
         //Room - Show
+        cmocka_unit_test(Room_show),
         //Room - Delete item
+        cmocka_unit_test(Room_delete_item_from_room),
         //Room - Add Item
+        cmocka_unit_test(Room_add_item_to_room),
         //Room - Get Item
-
+        cmocka_unit_test(Room_get_item_from_room)
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
