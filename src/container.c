@@ -106,17 +106,6 @@ void *get_from_container_by_name(struct container *first, const char *name)
         return NULL;
 }
 
-/**
- * Deletes container, which holds given entry leaving the entry intact
- *
- * This function destroys only one container in the list. The container is
- * identified based on the pointer to the entry it contains. Content of the
- * container stays unchanged! Function returns reference to the beginning of
- * this list.
- * @param first pointer to the first container of the list
- * @param entry container entry
- * @return Reference to the list of containers without given container.
- */
 struct container *remove_container(struct container *first, void *entry)
 {
     struct container *cursor = first;

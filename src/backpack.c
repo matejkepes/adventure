@@ -1,22 +1,27 @@
 #include "backpack.h"
 #include <stdlib.h>
 
+BACKPACK *create_backpack(const int capacity)
+{
 
-BACKPACK *create_backpack(const int capacity) {
-    // alloc for backpack struct
-    BACKPACK *backpack = malloc(sizeof(BACKPACK));
+    BACKPACK *backpack = NULL;
 
-    // set backpack capacity
+    backpack = malloc(sizeof(BACKPACK));
+
+    backpack->items = NULL;
     backpack->capacity = capacity;
-
-    return backpack;
+    backpack->size = 0;
 }
 
-BACKPACK *destroy_backpack(BACKPACK *backpack) {
+BACKPACK *destroy_backpack(BACKPACK *backpack)
+{
 
-    for (int i=0; i<backpack->size; i++){
-        free(&backpack->items[i]);
+    if (backpack == NULL)
+    {
+        return NULL;
     }
+
+    destroy_containers(backpack->items);
 
     // free backpack
     free(backpack);
@@ -24,16 +29,24 @@ BACKPACK *destroy_backpack(BACKPACK *backpack) {
     return NULL;
 }
 
-bool add_item_to_backpack(BACKPACK *backpack, ITEM *item) {
-/*         if (backpack->size < backpack->capacity) {
-            backpack->items = item;
+bool add_item_to_backpack(BACKPACK *backpack, ITEM *item)
+{
+
+    if (backpack->capacity > 0)
+    {
+        if (backpack->size < backpack->capacity)
+        {
+            backpack->items = create_container(backpack->items, TYPE_ITEM, item);
             backpack->size++;
             return true;
-        } else {
+        }
+        else
             return false;
-        } */
+    }
+    else
+        return false;
 }
 
-void delete_item_from_backpack(BACKPACK *backpack, ITEM *item) {
-
+void delete_item_from_backpack(BACKPACK *backpack, ITEM *item)
+{
 }
