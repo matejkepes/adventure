@@ -51,18 +51,17 @@ bool add_item_to_backpack(BACKPACK *backpack, ITEM *item)
 
 void delete_item_from_backpack(BACKPACK *backpack, ITEM *item)
 {
-    if (backpack != NULL) {
 
+    if (backpack != NULL && item != NULL)
+    {
 
-        if (get_from_container_by_name(backpack->items, item) != NULL) {
+        struct container *tmp = get_from_container_by_name(backpack->items, item->name);
 
-            struct container *tmp = get_from_container_by_name(backpack->items, item);
-            backpack->items = remove_container(backpack->items->item, tmp);
+        if (tmp != NULL)
+        {
+
+            backpack->items = remove_container(backpack->items, tmp->item);
             backpack->size--;
-
         }
-
-
     }
-
 }
