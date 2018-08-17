@@ -14,7 +14,6 @@ typedef struct COMMAND_STRUCT {
     char**  groups;         /// matched groups
 } COMMAND;
 
-
 /**
  * Creates command with name and description
  *
