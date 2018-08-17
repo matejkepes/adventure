@@ -562,13 +562,14 @@ static void World_add_room_to_world(void **state)
     struct room *roomThree = create_room("ROOM_Three", "DESCRIPTION");
     struct room *roomFour = create_room("ROOM_Four", "DESCRIPTION");
 
-    struct container *world = create_world();
+    struct container * world = malloc(sizeof(struct container));
+    world->type = TYPE_ROOM;
+    world->room = roomFour;
 
     assert_null(add_room_to_world(NULL, NULL));
     assert_null(add_room_to_world(NULL, roomOne));
     assert_ptr_equal(world, add_room_to_world(world, NULL));
 
-    world = add_room_to_world(world, roomFour);
     world = add_room_to_world(world, roomThree);
     world = add_room_to_world(world, roomTwo);
     world = add_room_to_world(world, roomOne);
@@ -716,5 +717,6 @@ int main(void)
         cmocka_unit_test(Parser_destroy_parser),
         cmocka_unit_test(Parser_parse_input),
     };
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
