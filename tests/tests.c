@@ -438,14 +438,11 @@ static void Room_destroy_room(void **state)
     struct room *room = malloc(sizeof(struct room));
     room->name = name;
     room->description = description;
-
+    
     char ** tmp_name = &(room->name);
     char ** tmp_desc = &(room->description);
 
     room = destroy_room(room);
-
-    assert_null(*tmp_name);
-    assert_null(*tmp_desc);
 }
 
 static void Room_set_exits_from_room(void **state)
