@@ -91,4 +91,13 @@ void add_item_to_room(struct room *room, ITEM *item)
 
 ITEM *get_item_from_room(const struct room *room, const char *name)
 {
+    if (room != NULL && name != NULL)
+    {
+        struct container *result = get_from_container_by_name(room->items, name);
+
+        if (result != NULL)
+            return result->item;
+    }
+
+    return NULL;
 }
