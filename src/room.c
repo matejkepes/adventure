@@ -55,6 +55,17 @@ void set_exits_from_room(struct room *room, struct room *north, struct room *sou
 
 void show_room(const struct room *room)
 {
+    if (room != NULL) {
+        printf("%s\n", room->name);
+        printf("%s\n", room->description);
+        printf("You see ");
+
+        for (struct container * head = room->items; head != NULL; head = head->next) {
+            printf("%s, ", head->item->name);
+        }
+
+        printf("\n");
+    }
 }
 
 void delete_item_from_room(struct room *room, ITEM *item)
