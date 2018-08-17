@@ -1,6 +1,7 @@
 #include "container.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 struct container *create_container(struct container *first, enum container_type type, void *entry)
 {
@@ -71,6 +72,16 @@ struct container *destroy_containers(struct container *first)
     return NULL;
 }
 
+int strcmp_lowercase(const char* s1, const char* s2)
+{
+    while(*s1 && (tolower(*s1) == tolower(*s2)))
+    {
+        s1++;
+        s2++;
+    }
+    return *(const unsigned char*)s1 - *(const unsigned char*)s2;
+}
+
 void *get_from_container_by_name(struct container *first, const char *name)
 {
     struct container *cursor = first;
@@ -79,25 +90,25 @@ void *get_from_container_by_name(struct container *first, const char *name)
 
         if (cursor->type == TYPE_ITEM)
         {
-            if(strcmp(cursor->item->name, name) == 0)
+            if(strcmp_lowercase(cursor->item->name, name) == 0)
                 return cursor;
         }
 
         if (cursor->type == TYPE_COMMAND)
         {
-            if(strcmp(cursor->command->name, name) == 0)
+            if(strcmp_lowercase(cursor->command->name, name) == 0)
                 return cursor;
         }
 
         if (cursor->type == TYPE_ROOM)
         {
-            if(strcmp(cursor->room->name, name) == 0)
+            if(strcmp_lowercase(cursor->room->name, name) == 0)
                 return cursor;
         }
 
         if (cursor->type == TYPE_TEXT)
         {
-            if(strcmp(cursor->text, name) == 0)
+            if(strcmp_lowercase(cursor->text, name) == 0)
                 return cursor;
         }
         
