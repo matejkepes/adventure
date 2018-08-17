@@ -429,8 +429,8 @@ static void Room_create_room(void **state)
 
 static void Room_destroy_room(void **state)
 {
-    char *name = "NAME";
-    char *description = "DESC";
+    char *name = strdup("NAME");
+    char *description = strdup("DESC");
     
     struct room *room = malloc(sizeof(struct room));
     room->name = name;
