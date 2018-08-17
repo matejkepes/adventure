@@ -263,11 +263,14 @@ static void removeFromContainer_ListNotEmpty_ItemRemovedProperly(void **state)
     //SETUP
     ITEM *itemOne = create_item("ITEM_ONE", "MIGHTY SWORD", 0x0000);
     ITEM *itemTwo = create_item("ITEM_TWO", "MIGHTY SWORD", 0x0000);
-    ITEM *itemThree = create_item("ITEM_THREE", "MIGHTY SWORD", 0x0000);
 
     struct container *first = create_container(NULL, TYPE_ITEM, itemOne);
     struct container *second = create_container(first, TYPE_ITEM, itemTwo);
-    struct container *third = create_container(second, TYPE_ITEM, itemThree);
+    
+    struct container * current_head = remove_container(second, itemTwo);
+    assert_non_null(current_head);
+    assert_ptr_equal(first, current_head);
+    assert_null(remove_container(current_head, itemOne));
 }
 
 static void backpack_create_backpack(void **state)
@@ -489,7 +492,6 @@ static void Room_delete_item_from_room(void **state)
     assert_ptr_equal(room->items, head);
     
     delete_item_from_room(room, itemTwo);
-
     assert_ptr_equal(room->items->item, itemOne);
 
     delete_item_from_room(room, itemOne);
@@ -563,6 +565,7 @@ int main(void)
         cmocka_unit_test(getFromContainer_ListNullReturnsNull),
         cmocka_unit_test(getFromContainer_ListContainsItem_ItemRetrieved),
         //Container - Remove container
+        cmocka_unit_test(removeFromContainer_ListNotEmpty_ItemRemovedProperly),
         cmocka_unit_test(removeContainer__ListNullEntryNull__returnsNull),
         cmocka_unit_test(removeContainer__ListNullEntryNotNull__returnsNull),
         cmocka_unit_test(removeContainer__EntryNull__returnsUnchagedList),

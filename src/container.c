@@ -123,7 +123,7 @@ struct container *remove_container(struct container *first, void *entry)
                 if (cursor == first) {
                     struct container *tmp = first->next;
                     first->next = NULL;
-                    return first->next;
+                    return tmp;
                 } else {
                     //Middle or last
 

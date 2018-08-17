@@ -75,9 +75,7 @@ void delete_item_from_room(struct room *room, ITEM *item)
     if (room != NULL && item != NULL)
     {
         struct container *item_to_delete = get_from_container_by_name(room->items, item->name);
-        //       printf("item to delete: %d\n", item_to_delete == NULL);
         room->items = remove_container(room->items, item_to_delete->item);
-        //       printf("Heeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeere \n");
     }
 }
 
