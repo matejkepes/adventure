@@ -15,10 +15,10 @@ COMMAND *create_command (char *name, char *description, char *pattern, size_t nm
     command->description = strdup(description);
    
     //Compile regex_t preg
-    int compilation_result = regcomp(&(command->preg), pattern, 0);
+    int compilation_result = regcomp(&(command->preg), pattern, REG_EXTENDED | REG_ICASE | REG_NOSUB);
     if (compilation_result) {
         printf("Could not compile regex\n");
-        exit(1);
+        return NULL;
     }   
 
     command->nmatch = nmatch;

@@ -13,7 +13,7 @@ endif
 
 TARGET = tests
 
-SRC = command.c item.c backpack.c container.c room.c world.c
+SRC = command.c item.c backpack.c container.c room.c world.c parser.c
 TEST_SRC = tests.c
 
 SRC_OBJ = $(patsubst %.c,obj/%.o,$(SRC)) 

@@ -11,6 +11,7 @@
 #include "backpack.h"
 #include "room.h"
 #include "world.h"
+#include "parser.h"
 
 static void createCommand_noMatches_returnsCommandsWithGroupsEqualsNull(void **state)
 {
@@ -556,12 +557,12 @@ static void World_create_world(void **state)
 
 static void World_add_room_to_world(void **state)
 {
-    struct room * roomOne = create_room("ROOM_One", "DESCRIPTION");
-    struct room * roomTwo = create_room("ROOM_Two", "DESCRIPTION");
-    struct room * roomThree = create_room("ROOM_Three", "DESCRIPTION");
-    struct room * roomFour = create_room("ROOM_Four", "DESCRIPTION");
+    struct room *roomOne = create_room("ROOM_One", "DESCRIPTION");
+    struct room *roomTwo = create_room("ROOM_Two", "DESCRIPTION");
+    struct room *roomThree = create_room("ROOM_Three", "DESCRIPTION");
+    struct room *roomFour = create_room("ROOM_Four", "DESCRIPTION");
 
-    struct container * world = create_world();
+    struct container *world = create_world();
 
     assert_null(add_room_to_world(NULL, NULL));
     assert_null(add_room_to_world(NULL, roomOne));
@@ -579,19 +580,19 @@ static void World_add_room_to_world(void **state)
 }
 static void World_destroy_world(void **state)
 {
-    struct container * world = create_world();
+    struct container *world = create_world();
     assert_null(destroy_world(world));
     assert_null(destroy_world(NULL));
 }
 
 static void World_get_room(void **state)
 {
-    struct room * roomOne = create_room("ROOM_One", "DESCRIPTION");
-    struct room * roomTwo = create_room("ROOM_Two", "DESCRIPTION");
-    struct room * roomThree = create_room("ROOM_Three", "DESCRIPTION");
-    struct room * roomFour = create_room("ROOM_Four", "DESCRIPTION");
+    struct room *roomOne = create_room("ROOM_One", "DESCRIPTION");
+    struct room *roomTwo = create_room("ROOM_Two", "DESCRIPTION");
+    struct room *roomThree = create_room("ROOM_Three", "DESCRIPTION");
+    struct room *roomFour = create_room("ROOM_Four", "DESCRIPTION");
 
-    struct container * world = create_world();
+    struct container *world = create_world();
     world = add_room_to_world(world, roomFour);
     world = add_room_to_world(world, roomThree);
     world = add_room_to_world(world, roomTwo);
@@ -601,7 +602,7 @@ static void World_get_room(void **state)
     assert_null(get_room(NULL, "ROOM"));
 
     assert_null(get_room(world, "ROOM"));
-   
+
     assert_ptr_equal(roomOne, get_room(world, "RoOm_OnE"));
     assert_ptr_equal(roomTwo, get_room(world, "RoOm_TWO"));
     assert_ptr_equal(roomThree, get_room(world, "RoOm_ThreE"));
@@ -611,6 +612,30 @@ static void World_get_room(void **state)
     assert_ptr_equal(roomTwo, get_room(world, "RoOm_TWO"));
     assert_ptr_equal(roomThree, get_room(world, "RoOm_ThreE"));
     assert_ptr_equal(roomFour, get_room(world, "RoOm_FoUr"));
+}
+
+static void Parser_create_parser(void **state)
+{
+    assert_non_null(create_parser());
+}
+
+static void Parser_destroy_parser(void **state)
+{
+    assert_null(destroy_parser(create_parser()));
+}
+
+static void Parser_parse_input(void **state)
+{
+    struct parser * parser = malloc(sizeof(struct parser));
+    COMMAND * start = create_command("START", "STARTS SOMETHING", "^\\s+START\\s+$", 0);
+    COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\s+EXAMINE\\+(.*)\\+\\s+$", 0);
+    assert_non_null(start);
+
+    parser->commands = create_container(NULL, TYPE_COMMAND, start);
+
+    assert_ptr_equal(parse_input(parser, "stArT"), start);
+    assert_ptr_equal(parse_input(parser, " eXaMinE iphone"), examine);
+    assert_string_equal(examine->groups[0], "iphone");
 }
 
 int main(void)
@@ -680,6 +705,10 @@ int main(void)
         //World - Destroy
         cmocka_unit_test(World_destroy_world),
         //World - Get room
-        cmocka_unit_test(World_get_room)};
+        cmocka_unit_test(World_get_room),
+        cmocka_unit_test(Parser_create_parser),
+        cmocka_unit_test(Parser_destroy_parser),
+        cmocka_unit_test(Parser_parse_input),
+    };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
