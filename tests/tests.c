@@ -577,6 +577,11 @@ static void World_add_room_to_world(void **state)
     assert_ptr_equal(roomTwo, get_nth_item_from_linked_list(world, 1)->room);
     assert_ptr_equal(roomThree, get_nth_item_from_linked_list(world, 2)->room);
     assert_ptr_equal(roomFour, get_nth_item_from_linked_list(world, 3)->room);
+
+     struct room * duplicate = create_room("ROOM_Four", "DESCRIPTION");
+     world = add_room_to_world(world, duplicate);
+
+    assert_int_equal(4, get_linked_list_size(world));
 }
 static void World_destroy_world(void **state)
 {
