@@ -1,12 +1,13 @@
 #include "room.h"
+#include <string.h>
 
 struct room *create_room(char *name, char *description)
 {
     if (name != NULL && description != NULL)
     {
         struct room *room = malloc(sizeof(struct room));
-        room->name = name;
-        room->description = description;
+        room->name = strdup(name);
+        room->description = strdup(description);
         room->north = NULL;
         room->south = NULL;
         room->east = NULL;
@@ -22,7 +23,9 @@ struct room *destroy_room(struct room *room)
 {
     if (room != NULL) {
        
+        free(room->name);
         room->name = NULL;
+        free(room->description);
         room->description = NULL;
         room->north = NULL;
         room->south = NULL;
@@ -32,8 +35,6 @@ struct room *destroy_room(struct room *room)
         room->items = NULL;
 
         free(room);
-
-        return NULL;
     }
 
     return NULL;
@@ -41,6 +42,15 @@ struct room *destroy_room(struct room *room)
 
 void set_exits_from_room(struct room *room, struct room *north, struct room *south, struct room *east, struct room *west)
 {
+    if (room != NULL) {
+        room->north = north;
+        room->south = south;
+        room->east = east;
+        room->west = west;
+        return room;
+    }
+
+    return NULL;
 }
 
 void show_room(const struct room *room)
