@@ -1,5 +1,6 @@
 #include "room.h"
 #include <string.h>
+#include <stdio.h>
 
 struct room *create_room(char *name, char *description)
 {
@@ -21,8 +22,9 @@ struct room *create_room(char *name, char *description)
 
 struct room *destroy_room(struct room *room)
 {
-    if (room != NULL) {
-       
+    if (room != NULL)
+    {
+
         free(room->name);
         room->name = NULL;
         free(room->description);
@@ -42,25 +44,25 @@ struct room *destroy_room(struct room *room)
 
 void set_exits_from_room(struct room *room, struct room *north, struct room *south, struct room *east, struct room *west)
 {
-    if (room != NULL) {
+    if (room != NULL)
+    {
         room->north = north;
         room->south = south;
         room->east = east;
         room->west = west;
-        return room;
     }
-
-    return NULL;
 }
 
 void show_room(const struct room *room)
 {
-    if (room != NULL) {
+    if (room != NULL)
+    {
         printf("%s\n", room->name);
         printf("%s\n", room->description);
         printf("You see ");
 
-        for (struct container * head = room->items; head != NULL; head = head->next) {
+        for (struct container *head = room->items; head != NULL; head = head->next)
+        {
             printf("%s, ", head->item->name);
         }
 
@@ -70,10 +72,21 @@ void show_room(const struct room *room)
 
 void delete_item_from_room(struct room *room, ITEM *item)
 {
+    if (room != NULL && item != NULL)
+    {
+        struct container *item_to_delete = get_from_container_by_name(room->items, item->name);
+        //       printf("item to delete: %d\n", item_to_delete == NULL);
+        room->items = remove_container(room->items, item_to_delete->item);
+        //       printf("Heeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeere \n");
+    }
 }
 
 void add_item_to_room(struct room *room, ITEM *item)
 {
+    if (room != NULL && item != NULL)
+    {
+        room->items = create_container(room->items, TYPE_ITEM, item);
+    }
 }
 
 ITEM *get_item_from_room(const struct room *room, const char *name)
