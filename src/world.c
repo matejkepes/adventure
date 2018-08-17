@@ -7,6 +7,8 @@ struct container *create_world()
     world->room = NULL;
     world->command = NULL;
     world->text = NULL;
+
+    return world;
 }
 
 struct container *add_room_to_world(struct container *world, struct room *room)
