@@ -631,7 +631,8 @@ static void Parser_parse_input(void **state)
     COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\s+EXAMINE\\+(.*)\\+\\s+$", 0);
     assert_non_null(start);
 
-    parser->commands = create_container(NULL, TYPE_COMMAND, start);
+
+    parser->commands = create_container(create_container(NULL, TYPE_COMMAND, start), TYPE_COMMAND, examine);
 
     assert_ptr_equal(parse_input(parser, "stArT"), start);
     assert_ptr_equal(parse_input(parser, " eXaMinE iphone"), examine);
