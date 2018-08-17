@@ -2,12 +2,7 @@
 
 struct container *create_world()
 {
-    struct container *world = create_container(world->room, TYPE_ROOM, NULL);
-    world->item = NULL;
-    world->room = NULL;
-    world->command = NULL;
-    world->text = NULL;
-
+    struct container *world = create_container(NULL, TYPE_ROOM, NULL);
     return world;
 }
 
