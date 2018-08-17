@@ -4,9 +4,7 @@
 BACKPACK *create_backpack(const int capacity)
 {
 
-    BACKPACK *backpack = NULL;
-
-    backpack = malloc(sizeof(BACKPACK));
+    BACKPACK *backpack = malloc(sizeof(BACKPACK));
 
     backpack->items = NULL;
     backpack->capacity = capacity;
