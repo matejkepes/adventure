@@ -48,32 +48,30 @@ struct command *parse_input(struct parser *parser, char *input)
 
         if (result == 0)
         {
-            printf("INPUT: %s MATCH: %s\n", input,command->name);
+
             if (command->nmatch > 0)
             {
-                char * cursor = input + groupArray[1].rm_so;
 
-                int string_size = (groupArray[1].rm_eo - groupArray[1].rm_so);
-                char parameter[string_size + 1];
+                for (int i = 1; i < command->nmatch + 1; i++)
+                {
+                    // puts cursor at the beginning of the first match
+                    char *cursor = input + groupArray[i].rm_so;
 
-                memcpy(parameter, cursor, string_size);
+                    // koniec matchu - zaciatok matchu = dlzka matchu
+                    int string_size = (groupArray[i].rm_eo - groupArray[i].rm_so);
 
-                parameter[string_size] = '\0';
+                    // allocate memory for match size into parameter
+                    char *parameter = malloc(sizeof(char) * (string_size + 1));
+                    memcpy(parameter, cursor, string_size);
 
-                printf("S: %lld E: %lld Param: %s\n", groupArray[1].rm_so, groupArray[1].rm_eo, parameter);
+                    parameter[string_size] = '\0';
 
-               command->groups[0]=parameter;
+                    command->groups[i - 1] = parameter;
+                }
             }
 
             return (struct command *)command;
         }
-        //if result == 0
-        //int startOffset, int endOffset
-        //input[endOffset] = '\0'
-        //
-        //char * param = strdup(input[startOffset])
-        //head->command->groups[0] = param;
-        //return head->command;
     }
 
     return NULL;
