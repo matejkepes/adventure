@@ -28,4 +28,15 @@ struct container *destroy_world(struct container *world)
 
 struct room *get_room(struct container *world, char *name)
 {
+    if (world == NULL)
+        return NULL;
+
+    if (name == NULL)
+        return NULL;
+
+    if (get_from_container_by_name(world, name))
+    {
+        struct container *room_to_get = get_from_container_by_name(world, name);
+        return room_to_get->room;
+    }
 }
