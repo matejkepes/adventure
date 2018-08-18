@@ -4,7 +4,7 @@
 
 struct parser *create_parser()
 {
-    // struct container *commands = create_command("look", "scan your environment for objects", "/(look)/gi", );
+    // struct container *commands = create_command("look", "scan your environment for objects", "/look/gi", );
 
     struct parser *parser = malloc(sizeof(struct parser));
 
@@ -25,7 +25,28 @@ struct parser *destroy_parser(struct parser *parser)
     return NULL;
 }
 
-struct command *parse_input(struct parser *parser, char *input)
+struct command * parse_input(struct parser *parser, char *input)
 {
 
+    // "pickup MIGHTY SWORD"
+
+    if(parser == NULL|| input == NULL)
+        return NULL;
+
+    int result;
+
+    for(struct container * head = parser->commands; head; head = head->next) {
+        //result = regexec(&(head->command->preg), input, head->command->nmatch
+
+        //if result == 0
+        //int startOffset, int endOffset
+        //input[endOffset] = '\0'
+        //
+        //char * param = strdup(input[startOffset])
+        //head->command->groups[0] = param;
+        //return head->command;
+    }
+    
+
+    return NULL;
 }
