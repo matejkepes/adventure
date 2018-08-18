@@ -637,15 +637,23 @@ static void Parser_parse_input(void **state)
 {
     struct parser * parser = malloc(sizeof(struct parser));
     COMMAND * start = create_command("START", "STARTS SOMETHING", "^\\s*START\\s*$", 0);
-    COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\ *examine\\ +([a-z][a-z\\ ]*[a-z])\\ *$", 1);
+    COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\ *examine\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
+    COMMAND * attack = create_command("ATTACK", "Attack $Target with $Item", "^\\ *attack\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ +with\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 2);
     assert_non_null(start);
 
 
-    parser->commands = create_container(create_container(NULL, TYPE_COMMAND, start), TYPE_COMMAND, examine);
+    parser->commands = create_container(create_container(create_container(NULL, TYPE_COMMAND, start), TYPE_COMMAND, examine), TYPE_COMMAND, attack);
 
     assert_ptr_equal(parse_input(parser, "stArT"), start);
     assert_ptr_equal(parse_input(parser, " eXaMinE iphone"), examine);
     assert_string_equal(examine->groups[0], "iphone");
+
+    assert_ptr_equal(parse_input(parser, " eXaMinE xiaomi mi mix2s"), examine);
+    assert_string_equal(examine->groups[0], "xiaomi mi mix2s");
+
+    assert_ptr_equal(parse_input(parser, "attack troll with sword"), attack);
+    assert_string_equal(attack->groups[0], "troll");
+    assert_string_equal(attack->groups[1], "sword");
 }
 
 int main(void)

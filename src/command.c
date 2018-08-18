@@ -15,7 +15,7 @@ COMMAND *create_command (char *name, char *description, char *pattern, size_t nm
     command->description = strdup(description);
    
     //Compile regex_t preg
-    int compilation_result = regcomp(&(command->preg), pattern, REG_EXTENDED | REG_ICASE | REG_NOSUB);
+    int compilation_result = regcomp(&(command->preg), pattern, REG_EXTENDED | REG_ICASE);
     if (compilation_result) {
         printf("Could not compile regex\n");
         return NULL;
