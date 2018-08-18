@@ -29,9 +29,6 @@ struct parser *destroy_parser(struct parser *parser)
 
 struct command *parse_input(struct parser *parser, char *input)
 {
-
-    // "pickup MIGHTY SWORD"
-
     if (parser == NULL || input == NULL)
         return NULL;
 
