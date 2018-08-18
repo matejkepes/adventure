@@ -39,4 +39,6 @@ struct room *get_room(struct container *world, char *name)
         struct container *room_to_get = get_from_container_by_name(world, name);
         return room_to_get->room;
     }
+
+    return NULL;
 }
