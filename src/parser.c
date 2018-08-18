@@ -17,8 +17,8 @@ struct parser *create_parser()
 struct parser *destroy_parser(struct parser *parser)
 {
     if (parser != NULL) {
-        parser = destroy_containers(parser->commands);
-        parser = destroy_containers(parser->history);
+        destroy_containers(parser->commands);
+        destroy_containers(parser->history);
         parser = NULL;
     }
 
