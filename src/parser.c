@@ -5,6 +5,34 @@
 
 struct parser *create_parser()
 {
+    // Quit       |  Exit, Q
+    // North      |  N
+    // South      |  S
+    // East       |  E
+    // West       |  W
+    // Look       |  
+    // Help       |  H
+    // Version    |
+    // Restart    |
+    // About      |
+    // Take       |
+    // Drop       |
+    // Inventory  |  I
+    // Use        |
+    // Examine    |
+    // Load       |
+    // Save       |
+
+
+
+
+
+
+
+
+
+
+
     // struct container *commands = create_command("look", "scan your environment for objects", "/look/gi", );
 
     struct parser *parser = malloc(sizeof(struct parser));
