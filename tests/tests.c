@@ -636,8 +636,8 @@ static void Parser_destroy_parser(void **state)
 static void Parser_parse_input(void **state)
 {
     struct parser * parser = malloc(sizeof(struct parser));
-    COMMAND * start = create_command("START", "STARTS SOMETHING", "^\\s+START\\s+$", 0);
-    COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\s+EXAMINE\\+(.*)\\+\\s+$", 0);
+    COMMAND * start = create_command("START", "STARTS SOMETHING", "^\\s*START\\s*$", 0);
+    COMMAND * examine = create_command("EXAMINE", "Examine an item SOMETHING", "^\\ *Examine\\ +(\\w+[\\ \\w]*)$", 1);
     assert_non_null(start);
 
 
