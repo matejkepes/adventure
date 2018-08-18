@@ -598,8 +598,11 @@ static void World_get_room(void **state)
     struct room *roomThree = create_room("ROOM_Three", "DESCRIPTION");
     struct room *roomFour = create_room("ROOM_Four", "DESCRIPTION");
 
-    struct container *world = create_world();
-    world = add_room_to_world(world, roomFour);
+    struct container * world = malloc(sizeof(struct container));
+    world->type = TYPE_ROOM;
+    world->room = roomFour;
+
+
     world = add_room_to_world(world, roomThree);
     world = add_room_to_world(world, roomTwo);
     world = add_room_to_world(world, roomOne);
