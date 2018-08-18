@@ -34,10 +34,15 @@ struct command * parse_input(struct parser *parser, char *input)
         return NULL;
 
     int result;
-
+    
     for(struct container * head = parser->commands; head; head = head->next) {
-        //result = regexec(&(head->command->preg), input, head->command->nmatch
+        regmatch_t groupArray[head->command->nmatch];
 
+        result = regexec(&(head->command->preg), input, head->command->nmatch, groupArray, 0);
+
+        if(result == 0) {
+            return head->command;
+        }
         //if result == 0
         //int startOffset, int endOffset
         //input[endOffset] = '\0'
