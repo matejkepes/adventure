@@ -194,6 +194,17 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Inventory") == 0)
     {
+        // is the backpack empty?
+        if (game->backpack->size == 0)
+            printf("There are no items in your backpack.\n");
+
+        // display the items in your backpack
+        if (game->backpack->size > 0)
+        {
+            printf("These items are in your inventory:\n");
+            for (struct container *head = game->backpack->items; head; head = head->next)
+                printf("%s\n", head->item->name);
+        }
     }
 
     if (strcmp(command->name, "Restart") == 0)
