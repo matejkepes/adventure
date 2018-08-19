@@ -87,7 +87,7 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Take") == 0)
     {
-        struct container *item_to_take = get_from_container_by_name(game->current_room->items, command->groups);
+        struct container *item_to_take = get_from_container_by_name(game->current_room->items, command->groups[0]);
     
         if (item_to_take == NULL)
             ("There is no such item in this room.\n");
@@ -95,16 +95,18 @@ void execute_command(struct game *game, struct command *command)
         if (item_to_take->item->properties != MOVABLE)
             ("This item is too heavy to be picked up.\n");
 
-        if (game->backpack->size >= game->backpack->capacity)
+        if (game->backpack->size == game->backpack->capacity)
             ("There is not enough room in your backpack for this item. You will have to drop something else first.\n");
     
         game->backpack = item_to_take;
+        game->backpack->size--;
         game->current_room->items = remove_container(game->current_room->items, item_to_take);
         printf("You have taken %s.\n", item_to_take);
     }
 
     if (strcmp(command->name, "Drop") == 0)
     {
+        struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups);
     }
 
     if (strcmp(command->name, "Use") == 0)
