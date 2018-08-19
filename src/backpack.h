@@ -9,7 +9,7 @@
 /**
  * Structure representing the backpack
  */
-typedef struct BACKPACK_STRUCT {
+typedef struct backpack {
     int capacity;               /// backpack capacity (max nr. of items)
     int size;                   /// current size
     struct container* items;    /// list of items
