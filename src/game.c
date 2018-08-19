@@ -209,6 +209,33 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Restart") == 0)
     {
+        char input[20];
+
+        printf("Are you sure you want to restart the game? All progress will be lost.\n");
+
+        scanf("%s", &input);
+    
+        regex_t yes_reg;
+        regex_t no_reg;
+
+        int result =
+            regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) &&
+            regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
+
+        if (result == 1)
+            exit(1);
+        
+        int yes = regexec(&yes_reg, input, 0, NULL, 0);
+        int no = regexec(&no_reg, input, 0, NULL, 0);
+
+        if (yes && no)
+            printf("I didn't understand that.\n");
+        
+        if (!yes)
+            game->state = RESTART;
+
+        if (!no)
+            printf("Okay.\n"); 
     }
 
     if (strcmp(command->name, "Quit") == 0)
