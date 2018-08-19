@@ -38,12 +38,25 @@ struct game *create_game()
 
     if (game != NULL)
         return game;
-    
+
     return NULL;
 }
 
 struct game *destroy_game(struct game *game)
 {
+    if (game != NULL)
+    {
+        game->backpack = destroy_backpack(game->backpack);
+        game->backpack = NULL;
+        game->current_room = NULL;
+        game->parser = destroy_parser(game->parser);
+        game->parser = NULL;
+        game->world = destroy_containers(game->world);
+        game->world = NULL;
+        game->state = GAMEOVER;
+    }
+
+    return NULL;
 }
 
 void execute_command(struct game *game, struct command *command)
