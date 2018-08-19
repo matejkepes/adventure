@@ -101,24 +101,36 @@ void execute_command(struct game *game, struct command *command)
         game->backpack->items = item_to_take;
         game->backpack->size--;
         game->current_room->items = remove_container(game->current_room->items, item_to_take);
-        printf("You have taken %s.\n", item_to_take);
+        printf("You have taken %s.\n", item_to_take->item->name);
     }
 
     if (strcmp(command->name, "Drop") == 0)
     {
-        struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups);
+        struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups[0]);
 
         if (item_to_drop == NULL)
             ("You can't drop that because there is no such item in your backpack.\n");
-        
+
         game->current_room->items = create_container(game->current_room->items, TYPE_ITEM, item_to_drop);
         game->backpack->items = remove_container(game->backpack->items, item_to_drop);
         game->backpack->size++;
-        printf("You have dropped %s.\n", item_to_drop);
+        printf("You have dropped %s.\n", item_to_drop->item->name);
     }
 
     if (strcmp(command->name, "Use") == 0)
     {
+        struct container *item_to_use;
+
+        if (get_from_container_by_name(game->current_room->items, command->groups[0]))
+            item_to_use = get_from_container_by_name(game->current_room->items, command->groups[0]);
+
+        if (get_from_container_by_name(game->backpack->items, command->groups[0]))
+            item_to_use = get_from_container_by_name(game->backpack->items, command->groups[0]);
+
+        if (item_to_use->item->properties != USABLE)
+            printf("You can't use %s.\n", item_to_use->item->name);
+
+        // TODO: implement usability for each item in the game
     }
 
     if (strcmp(command->name, "Examine") == 0)
