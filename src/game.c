@@ -1,4 +1,5 @@
 #include "game.h"
+#include <stdio.h>
 
 void play_game(struct game *game)
 {
@@ -87,17 +88,26 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Take") == 0)
     {
+        // check for matches
+        if (!command->groups[0])
+            printf("What do you want to take?\n");
+
+        // find the item in the room
         struct container *item_to_take = get_from_container_by_name(game->current_room->items, command->groups[0]);
 
-        if (item_to_take == NULL)
-            ("There is no such item in this room.\n");
+        // was the item found?
+        if (!item_to_take)
+            printf("There is no %s in this room.\n", command->groups[0]);
 
+        // can you pick up the item?
         if (item_to_take->item->properties != MOVABLE)
-            ("This item is too heavy to be picked up.\n");
+            printf("This item is too heavy to be picked up.\n");
 
+        // is there enough room in your backpack?
         if (game->backpack->size == game->backpack->capacity)
-            ("There is not enough room in your backpack for this item. You will have to drop something else first.\n");
+            printf("There is not enough room in your backpack for the %s. You will have to drop something else first.\n", item_to_take->item->name);
 
+        // take the item
         game->backpack->items = item_to_take;
         game->backpack->size--;
         game->current_room->items = remove_container(game->current_room->items, item_to_take);
@@ -106,11 +116,18 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Drop") == 0)
     {
+        // check for matches
+        if (!command->groups[0])
+            printf("What do you want to drop?\n");
+
+        // find the item in the backpack
         struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups[0]);
 
-        if (item_to_drop == NULL)
-            ("You can't drop that because there is no such item in your backpack.\n");
+        // was the item found?
+        if (!item_to_drop)
+            printf("You can't drop %s.\n", command->groups[0]);
 
+        // drop the item
         game->current_room->items = create_container(game->current_room->items, TYPE_ITEM, item_to_drop);
         game->backpack->items = remove_container(game->backpack->items, item_to_drop);
         game->backpack->size++;
@@ -119,22 +136,60 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Use") == 0)
     {
+        // check for matches
+        if (!command->groups[0])
+            printf("What do you want to Use?\n");
+
+        // find the item in the room or in the backpack
         struct container *item_to_use;
 
+        // was the item found in the room?
         if (get_from_container_by_name(game->current_room->items, command->groups[0]))
             item_to_use = get_from_container_by_name(game->current_room->items, command->groups[0]);
 
+        // was the item found in the backpack?
         if (get_from_container_by_name(game->backpack->items, command->groups[0]))
             item_to_use = get_from_container_by_name(game->backpack->items, command->groups[0]);
 
+        // was the item not found?
+        if (!item_to_use)
+            printf("I can't see any %s.\n", command->groups[0]);
+
+        // is the item usable?
         if (item_to_use->item->properties != USABLE)
             printf("You can't use %s.\n", item_to_use->item->name);
 
+        // use the item
         // TODO: implement usability for each item in the game
     }
 
     if (strcmp(command->name, "Examine") == 0)
     {
+        // check for matches
+        if (!command->groups[0])
+            printf("What do you want to examine?\n");
+
+        // find the item in the room or in the backpack
+        struct container *item_to_examine;
+
+        // was the item found in the room?
+        if (get_from_container_by_name(game->current_room->items, command->groups[0]))
+            item_to_examine = get_from_container_by_name(game->current_room->items, command->groups[0]);
+
+        // was the item found in the backpack?
+        if (get_from_container_by_name(game->backpack->items, command->groups[0]))
+            item_to_examine = get_from_container_by_name(game->backpack->items, command->groups[0]);
+
+        // was the item not found?
+        if (!item_to_examine)
+            printf("I can't see any %s.\n", item_to_examine->item->name);
+
+        // is the item examinable?
+        if (item_to_examine->item->properties != EXAMINABLE)
+            printf("There's nothing to say about %s.\n", item_to_examine->item->name);
+
+        // examine the item
+        printf("%s\n.", command->groups[0]);
     }
 
     if (strcmp(command->name, "Inventory") == 0)
