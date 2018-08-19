@@ -10,6 +10,8 @@
 /// Max. size of input buffer (line)
 #define INPUT_BUFFER_SIZE 100
 
+#define BACKPACK_CAPACITY 100
+
 /**
  * Available game states
  */
