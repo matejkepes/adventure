@@ -6,6 +6,8 @@
 #include "backpack.h"
 #include "parser.h"
 #include "container.h"
+#include <stdio.h>
+#include <time.h>
 
 /// Max. size of input buffer (line)
 #define INPUT_BUFFER_SIZE 100
