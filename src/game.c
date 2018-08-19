@@ -157,7 +157,7 @@ void execute_command(struct game *game, struct command *command)
     {
         // check for matches
         if (!command->groups[0])
-            printf("What do you want to Use?\n");
+            printf("What do you want to use?\n");
 
         // find the item in the room or in the backpack
         struct container *item_to_use;
@@ -179,8 +179,33 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't use %s.\n", item_to_use->item->name);
 
         // use the item
-        printf("I don't know how to use an item yet. Sorry.\n");
         // TODO: implement usability for each item in the game
+
+        // Golden watch will add the bling.
+        // Dusty bed will give you rest and allergies.
+        // The orb | use it in the last room to win the game.
+
+        if (strcmp(item_to_use->item->name, "Golden Watch") == 0)
+        {
+            printf("You can feel all the bling pouring over you as you put this watch on your wrist.\n");
+        }
+
+        if (strcmp(item_to_use->item->name, "Dusty Bed") == 0)
+        {
+            printf("You are refreshed after taking a nap in the dusty bed. For some reason, your nose is itching.\n");
+        }
+
+        if (strcmp(item_to_use->item->name, "The Orb") == 0)
+        {
+            if (strcmp(game->current_room->name, "Room O") != 0)
+                printf("You put your hand on the orb and notice a slight tingling sensation. The Orb lits up slightly. It's almost as if it was telling you to take it to the last room.\n");
+
+            if (strcmp(game->current_room->name, "Room O") == 0)
+            {
+                printf("You place your hand on the orb and it lits up the whole room, exposing a writing on the wall which says 'The End'.\n");
+                game->state = SOLVED;
+            }
+        }
 
         // add the executed command to the history log
         game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
@@ -212,7 +237,7 @@ void execute_command(struct game *game, struct command *command)
             printf("There's nothing to say about %s.\n", item_to_examine->item->name);
 
         // examine the item
-        printf("%s\n.", command->groups[0]);
+        printf("%s\n.", item_to_examine->item->description);
     }
 
     if (strcmp(command->name, "Inventory") == 0)
