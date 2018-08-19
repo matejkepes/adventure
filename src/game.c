@@ -10,6 +10,7 @@ void play_game(struct game *game)
 
         if (game->state == SOLVED)
         {
+            printf("Congratulations!! You have finished the adventure!! What an accomplishment.\n");
         }
 
         if (game->state == GAMEOVER)
@@ -67,21 +68,30 @@ void execute_command(struct game *game, struct command *command)
     if (strcmp(command->name, "North") == 0)
     {
         printf("You can't tell me what to do.\n");
+
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "South") == 0)
     {
         printf("It's gonna take a lot to take me away from you.\n");
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "East") == 0)
     {
         printf("Eastern Europe Best Europe\n");
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "West") == 0)
     {
         printf("LGBTQ and SJW\n");
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "Look") == 0)
@@ -115,6 +125,9 @@ void execute_command(struct game *game, struct command *command)
         game->backpack->size--;
         game->current_room->items = remove_container(game->current_room->items, item_to_take);
         printf("You have taken %s.\n", item_to_take->item->name);
+
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "Drop") == 0)
@@ -135,6 +148,9 @@ void execute_command(struct game *game, struct command *command)
         game->backpack->items = remove_container(game->backpack->items, item_to_drop);
         game->backpack->size++;
         printf("You have dropped %s.\n", item_to_drop->item->name);
+
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "Use") == 0)
@@ -165,6 +181,9 @@ void execute_command(struct game *game, struct command *command)
         // use the item
         printf("I don't know how to use an item yet. Sorry.\n");
         // TODO: implement usability for each item in the game
+
+        // add the executed command to the history log
+        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "Examine") == 0)
@@ -320,6 +339,5 @@ void execute_command(struct game *game, struct command *command)
     if (strcmp(command->name, "Help") == 0)
     {
         printf("I don't want to help you. Sorry.\n");
-        
     }
 }
