@@ -6,7 +6,7 @@
 /**
  * Struct defining command
  */
-typedef struct COMMAND_STRUCT {
+typedef struct command {
     char*   name;           /// command name, must be unique
     char*   description;    /// command description
     regex_t preg;           /// precompiled pattern buffer
