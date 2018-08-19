@@ -66,18 +66,22 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "North") == 0)
     {
+        printf("You can't tell me what to do.\n");
     }
 
     if (strcmp(command->name, "South") == 0)
     {
+        printf("It's gonna take a lot to take me away from you.\n");
     }
 
     if (strcmp(command->name, "East") == 0)
     {
+        printf("Eastern Europe Best Europe\n");
     }
 
     if (strcmp(command->name, "West") == 0)
     {
+        printf("LGBTQ and SJW\n");
     }
 
     if (strcmp(command->name, "Look") == 0)
@@ -159,6 +163,7 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't use %s.\n", item_to_use->item->name);
 
         // use the item
+        printf("I don't know how to use an item yet. Sorry.\n");
         // TODO: implement usability for each item in the game
     }
 
@@ -294,22 +299,27 @@ void execute_command(struct game *game, struct command *command)
 
         fclose(f);
 
-        printf("Game saved.\n");
+        printf("Game saved. Maybe.\n");
     }
 
     if (strcmp(command->name, "Load") == 0)
     {
+        printf("I don't know how to load a saved game yet. Sorry.\n");
     }
 
     if (strcmp(command->name, "Version") == 0)
     {
+        printf("This is the best version. by Matej and Veronika.\n");
     }
 
     if (strcmp(command->name, "About") == 0)
     {
+        printf("This game is very nice.\n");
     }
 
     if (strcmp(command->name, "Help") == 0)
     {
+        printf("I don't want to help you. Sorry.\n");
+        
     }
 }
