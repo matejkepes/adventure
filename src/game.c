@@ -1,5 +1,4 @@
 #include "game.h"
-#include <stdio.h>
 
 void play_game(struct game *game)
 {
@@ -214,7 +213,7 @@ void execute_command(struct game *game, struct command *command)
         printf("Are you sure you want to restart the game? All progress will be lost.\n");
 
         scanf("%s", &input);
-    
+
         regex_t yes_reg;
         regex_t no_reg;
 
@@ -224,29 +223,81 @@ void execute_command(struct game *game, struct command *command)
 
         if (result == 1)
             exit(1);
-        
+
         int yes = regexec(&yes_reg, input, 0, NULL, 0);
         int no = regexec(&no_reg, input, 0, NULL, 0);
 
         if (yes && no)
             printf("I didn't understand that.\n");
-        
+
         if (!yes)
             game->state = RESTART;
 
         if (!no)
-            printf("Okay.\n"); 
+            printf("Okay.\n");
     }
 
     if (strcmp(command->name, "Quit") == 0)
     {
-    }
+        char input[20];
 
-    if (strcmp(command->name, "Load") == 0)
-    {
+        printf("Are you sure you want to quit the game? All progress will be lost.\n");
+
+        scanf("%s", &input);
+
+        regex_t yes_reg;
+        regex_t no_reg;
+
+        int result =
+            regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) &&
+            regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
+
+        if (result == 1)
+            exit(1);
+
+        int yes = regexec(&yes_reg, input, 0, NULL, 0);
+        int no = regexec(&no_reg, input, 0, NULL, 0);
+
+        if (yes && no)
+            printf("I didn't understand that.\n");
+
+        if (!yes)
+        {
+            printf("Goodbye.\n");
+            game->state = GAMEOVER;
+        }
+
+        if (!no)
+            printf("Okay.\n");
     }
 
     if (strcmp(command->name, "Save") == 0)
+    {
+        time_t timer;
+        char buffer[36];
+        struct tm *tm_info;
+
+        time(&timer);
+        tm_info = localtime(&timer);
+
+        strftime(buffer, 36, "saves/%Y%m%d%H%M%S.txt", tm_info);
+
+        FILE *f = fopen(buffer, "w");
+        if (f == NULL)
+        {
+            printf("Error opening file!\n");
+            exit(1);
+        }
+
+        for (struct container *head = game->parser->history; head; head = head->next)
+            fwrite(&game->parser->history->command, sizeof(struct command), 1, f);
+
+        fclose(f);
+
+        printf("Game saved.\n");
+    }
+
+    if (strcmp(command->name, "Load") == 0)
     {
     }
 
