@@ -13,7 +13,9 @@ void play_game(struct game *game)
         while (game->state == PLAYING)
         {
             printf("\n> ");
-            scanf("%s", input);
+            fgets(input, INPUT_BUFFER_SIZE, stdin);
+            input[strlen(input) -1] ='\0';
+
             struct command *command = parse_input(parser, input);
             if (command != NULL)
             {
@@ -49,7 +51,7 @@ struct game *create_game()
 
     game->world = create_world();
     game->backpack = create_backpack(BACKPACK_CAPACITY);
-    game->current_room = create_room("Room A", "This is room A.");
+    game->current_room = game->world->room;
     game->parser = create_parser();
     game->state = PLAYING;
     game->world = NULL;
@@ -81,6 +83,8 @@ void execute_command(struct game *game, struct command *command)
 {
     if (game == NULL || command == NULL)
         return;
+
+    printf("Command to execute: %s\n", command->name);
 
     if (strcmp(command->name, "North") == 0)
     {
@@ -164,19 +168,24 @@ void execute_command(struct game *game, struct command *command)
         // was the item found?
         if (!item_to_take)
             printf("There is no %s in this room.\n", command->groups[0]);
-
+    
+        
         // can you pick up the item?
-        if (item_to_take->item->properties != MOVABLE)
+        if (!((item_to_take->item->properties & 0x0001) == 0x0001)) {
             printf("This item is too heavy to be picked up.\n");
+            return;
+        }
 
         // is there enough room in your backpack?
-        if (game->backpack->size == game->backpack->capacity)
+        if (game->backpack->size == game->backpack->capacity){
             printf("There is not enough room in your backpack for the %s. You will have to drop something else first.\n", item_to_take->item->name);
+            return;
+        }
 
         // take the item
-        game->backpack->items = item_to_take;
-        game->backpack->size--;
-        game->current_room->items = remove_container(game->current_room->items, item_to_take);
+        game->backpack->items = create_container(game->backpack->items, TYPE_ITEM, item_to_take->item);
+        game->backpack->size++;
+        game->current_room->items = remove_container(game->current_room->items, item_to_take->item);
         printf("You have taken %s.\n", item_to_take->item->name);
 
         // add the executed command to the history log
@@ -199,7 +208,7 @@ void execute_command(struct game *game, struct command *command)
         // drop the item
         game->current_room->items = create_container(game->current_room->items, TYPE_ITEM, item_to_drop);
         game->backpack->items = remove_container(game->backpack->items, item_to_drop);
-        game->backpack->size++;
+        game->backpack->size--;
         printf("You have dropped %s.\n", item_to_drop->item->name);
 
         // add the executed command to the history log

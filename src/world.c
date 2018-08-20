@@ -58,24 +58,23 @@ struct container *create_world()
     add_item_to_room(room_L, iron_sword);
     add_item_to_room(room_N, generic_item);
 
-    struct container *world = create_container(NULL, TYPE_ROOM, room_A);
+    struct container *world = create_container(NULL, TYPE_ROOM, room_O);
 
-    world = add_room_to_world(world, room_B);
-    world = add_room_to_world(world, room_C);
-    world = add_room_to_world(world, room_D);
-    world = add_room_to_world(world, room_E);
-
-    world = add_room_to_world(world, room_F);
-    world = add_room_to_world(world, room_G);
-    world = add_room_to_world(world, room_H);
-    world = add_room_to_world(world, room_I);
-    world = add_room_to_world(world, room_J);
-
-    world = add_room_to_world(world, room_K);
-    world = add_room_to_world(world, room_L);
-    world = add_room_to_world(world, room_M);
-    world = add_room_to_world(world, room_N);
     world = add_room_to_world(world, room_O);
+    world = add_room_to_world(world, room_N);
+    world = add_room_to_world(world, room_M);
+    world = add_room_to_world(world, room_L);
+    world = add_room_to_world(world, room_K);
+    world = add_room_to_world(world, room_J);
+    world = add_room_to_world(world, room_I);
+    world = add_room_to_world(world, room_H);
+    world = add_room_to_world(world, room_G);
+    world = add_room_to_world(world, room_F);
+    world = add_room_to_world(world, room_E);
+    world = add_room_to_world(world, room_D);
+    world = add_room_to_world(world, room_C);
+    world = add_room_to_world(world, room_B);
+    world = add_room_to_world(world, room_A);
 
     return world;
 }

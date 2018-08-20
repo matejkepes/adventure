@@ -84,7 +84,6 @@ struct command *parse_input(struct parser *parser, char *input)
         result =
             command->nmatch == 0 ? regexec(&(command->preg), input, 0, NULL, 0)
                                  : regexec(&(command->preg), input, command->nmatch + 1, groupArray, 0);
-
         if (result == 0)
         {
 
@@ -92,7 +91,8 @@ struct command *parse_input(struct parser *parser, char *input)
             {
 
                 for (int i = 1; i < command->nmatch + 1; i++)
-                {
+                {   
+                    free(command->groups[i-1]);
                     // puts cursor at the beginning of the first match
                     char *cursor = input + groupArray[i].rm_so;
 
