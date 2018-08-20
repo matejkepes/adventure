@@ -3,3 +3,5 @@ tests/obj
 tests/cmocka
 tests/tests
 .vscode/*
+src/*.o
+src/adventure
