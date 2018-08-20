@@ -67,7 +67,16 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "North") == 0)
     {
-        printf("You can't tell me what to do.\n");
+
+        if (game->current_room->north != NULL)
+        {
+            struct room *room_to_go_to = game->current_room->north;
+            game->current_room = room_to_go_to;
+            show_room(game->current_room);
+        }
+
+        if (game->current_room->north == NULL)
+            printf("You can't go there.\n");
 
         // add the executed command to the history log
         game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
@@ -75,21 +84,48 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "South") == 0)
     {
-        printf("It's gonna take a lot to take me away from you.\n");
+        if (game->current_room->south != NULL)
+        {
+            struct room *room_to_go_to = game->current_room->south;
+            game->current_room = room_to_go_to;
+            show_room(game->current_room);
+        }
+
+        if (game->current_room->south == NULL)
+            printf("You can't go there.\n");
+
         // add the executed command to the history log
         game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "East") == 0)
     {
-        printf("Eastern Europe Best Europe\n");
+        if (game->current_room->east != NULL)
+        {
+            struct room *room_to_go_to = game->current_room->east;
+            game->current_room = room_to_go_to;
+            show_room(game->current_room);
+        }
+
+        if (game->current_room->east == NULL)
+            printf("You can't go there.\n");
+
         // add the executed command to the history log
         game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     if (strcmp(command->name, "West") == 0)
     {
-        printf("LGBTQ and SJW\n");
+        if (game->current_room->west != NULL)
+        {
+            struct room *room_to_go_to = game->current_room->west;
+            game->current_room = room_to_go_to;
+            show_room(game->current_room);
+        }
+
+        if (game->current_room->west == NULL)
+            printf("You can't go there.\n");
+
         // add the executed command to the history log
         game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
