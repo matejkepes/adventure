@@ -4,8 +4,21 @@ void play_game(struct game *game)
 {
     if (game != NULL)
     {
+        char input[INPUT_BUFFER_SIZE];
+        struct parser *parser = create_parser();
+
+        printf("Welcome to the Adventure!\n");
+        show_room(game->current_room);
+
         while (game->state == PLAYING)
         {
+            printf("\n> ");
+            scanf("%s", input);
+            struct command *command = parse_input(parser, input);
+            if (command != NULL)
+            {
+                execute_command(game, command);
+            }
         }
 
         if (game->state == SOLVED)
@@ -26,13 +39,15 @@ void play_game(struct game *game)
             play_game(game);
         }
     }
+    printf("Couldn't start the game.\n");
+    exit(1);
 }
 
 struct game *create_game()
 {
     struct game *game = malloc(sizeof(struct game));
     game->backpack = create_backpack(BACKPACK_CAPACITY);
-    game->current_room = NULL;
+    game->current_room = create_room("Room A", "This is room A.");
     game->parser = create_parser();
     game->state = PLAYING;
     game->world = NULL;
@@ -297,7 +312,7 @@ void execute_command(struct game *game, struct command *command)
 
         printf("Are you sure you want to restart the game? All progress will be lost.\n");
 
-        scanf("%s", &input);
+        scanf("%s", input);
 
         regex_t yes_reg;
         regex_t no_reg;
@@ -328,7 +343,7 @@ void execute_command(struct game *game, struct command *command)
 
         printf("Are you sure you want to quit the game? All progress will be lost.\n");
 
-        scanf("%s", &input);
+        scanf("%s", input);
 
         regex_t yes_reg;
         regex_t no_reg;
