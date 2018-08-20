@@ -46,6 +46,8 @@ void play_game(struct game *game)
 struct game *create_game()
 {
     struct game *game = malloc(sizeof(struct game));
+
+    game->world = create_world();
     game->backpack = create_backpack(BACKPACK_CAPACITY);
     game->current_room = create_room("Room A", "This is room A.");
     game->parser = create_parser();
