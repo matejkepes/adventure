@@ -5,3 +5,5 @@ tests/tests
 .vscode/*
 src/*.o
 src/adventure
+src/game.c
+saves/*

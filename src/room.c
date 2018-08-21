@@ -59,14 +59,15 @@ void show_room(const struct room *room)
     {
         printf("%s\n", room->name);
         printf("%s\n", room->description);
-        printf("You see ");
 
-        for (struct container *head = room->items; head != NULL; head = head->next)
+        if (room->items == NULL)
+            printf("You can't see any items in this room.\n");
+        else
         {
-            printf("%s, ", head->item->name);
+            printf("\nYou see:\n");
+            for (struct container *head = room->items; head != NULL; head = head->next)
+                printf("%s\n", head->item->name);
         }
-
-        printf("\n");
     }
 }
 
@@ -91,7 +92,7 @@ ITEM *get_item_from_room(const struct room *room, const char *name)
 {
     if (room != NULL && name != NULL)
     {
-        
+
         struct container *result = get_from_container_by_name(room->items, name);
 
         if (result != NULL)
