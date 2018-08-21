@@ -1,6 +1,5 @@
 #include "game.h"
 
-
 struct container *read_next_from_file(struct game *game, FILE *f)
 {
 
@@ -26,10 +25,6 @@ struct container *read_next_from_file(struct game *game, FILE *f)
     }
     return start;
 }
-
-
-
-
 
 void play_game(struct game *game)
 {
@@ -499,7 +494,7 @@ void execute_command(struct game *game, struct command *command)
         strftime(buffer, 36, "saves/%Y%m%d%H%M%S.txt", tm_info); */
 
         //   FILE *f = fopen(buffer, "w");
-        FILE *f = fopen("saves/savegame.bin", "wb");
+        FILE *f = fopen("saves/savegame.txt", "w");
         if (f == NULL)
         {
             printf("Error opening file!\n");
@@ -511,29 +506,41 @@ void execute_command(struct game *game, struct command *command)
         struct container *cmd_current = game->parser->history;
         struct container *cmd_hold_next = NULL;
 
-        while (cmd_current != NULL)
+        int commands_in_history = 0;
+
+        for (; cmd_current; cmd_current = cmd_current->next)
+            commands_in_history++;
+
+        if (commands_in_history == 0)
         {
-            cmd_hold_next = cmd_current->next;
-            cmd_current->next = NULL;
+            printf("Nothing to save\n");
+            return;
+        }
 
-            fseek(f, 0, SEEK_END);
-            fwrite(cmd_current, sizeof(struct container), 1, f);
+        for (int i = commands_in_history; i > 0; --i)
+        {
+            struct container *head = game->parser->history;
 
-            printf("Writing %s to file\n", cmd_current->command->name);
+            for (int index = 1; head != NULL; head = head->next, index++)
+            {
+                if (index == i)
+                {
+                    printf("Writing %s to file\n", head->command->name);
 
-            cmd_current->next = cmd_hold_next;
-            cmd_hold_next = NULL;
+                    fprintf(f, "%s", head->command->name);
 
-            cmd_current = cmd_current->next;
+                    for (int i = 0; i < head->command->nmatch; i++)
+                    {
+                        fprintf(f, " %s", head->command->groups[i]);
+                    }
+
+                    fprintf(f, "\n");
+                }
+            }
         }
 
         fclose(f);
         f = NULL;
-
-        //########################################################################
-
-        /*         for (struct container *head = game->parser->history; head; head = head->next)
-            fwrite(&game->parser->history->command, sizeof(struct command), 1, f); */
 
         printf("Game saved.\n");
         return;
@@ -543,30 +550,35 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Load") == 0)
     {
-        FILE *f = fopen("saves/savegame.bin", "rb");
+        char *line = NULL;
+        size_t len = 0;
+        ssize_t read;
+
+        FILE *f = fopen("saves/savegame.txt", "r");
         if (f == NULL)
         {
             printf("Error opening file!\n");
             return;
         }
 
-        struct container *start = game->parser->history;
-
+        game->backpack = destroy_backpack(game->backpack);
+        game->backpack = create_backpack(BACKPACK_CAPACITY);
+        game->world = destroy_world(game->world);
+        game->world = create_world();
         game->parser->history = destroy_containers(game->parser->history);
-        game->parser->history = NULL;
+        game->current_room = game->world->room;
+        game->state = PLAYING;
 
-        fseek(f, 0, SEEK_END);
-        long f_size = ftell(f);
-        rewind(f);
-
-        int num_entries = (int)(f_size / (sizeof(struct container)));
-        printf("num_entries: %d\n", num_entries);
-
-        for (int loop = 0; loop < num_entries; ++loop)
+        while ((read = getline(&line, &len, f)) != -1)
         {
-            fseek(f, (sizeof(struct container) * loop), SEEK_SET);
-            start = read_next_from_file(game, f);
-            execute_command(game, start->command);
+            line[strlen(line) - 1] = '\0';
+
+            struct command *cmd = parse_input(game->parser, line);
+            if (cmd)
+            {
+                printf("Command to execute: %s\n", cmd->name);
+                execute_command(game, cmd);
+            }
         }
 
         fclose(f);
