@@ -10,6 +10,8 @@
         "stdlib.h": "c",
         "typeindex": "c",
         "typeinfo": "c",
-        "game.h": "c"
+        "game.h": "c",
+        "string.h": "c",
+        "command.h": "c"
     }
 }

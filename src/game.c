@@ -1,37 +1,10 @@
 #include "game.h"
 
-struct container *read_next_from_file(struct game *game, FILE *f)
-{
-
-    struct container *start = game->parser->history;
-    size_t return_value;
-    if (start == NULL)
-    {
-        start = malloc(sizeof(struct container));
-        return_value = fread(start, sizeof(struct container), 1, f);
-        start->next = NULL;
-    }
-    else
-    {
-        struct container *index = start;
-        struct container *new_command = malloc(sizeof(struct container));
-        while (index->next != NULL)
-        {
-            index = index->next;
-        }
-        return_value = fread(new_command, sizeof(struct container), 1, f);
-        index->next = new_command;
-        new_command->next = NULL;
-    }
-    return start;
-}
-
 void play_game(struct game *game)
 {
     if (game != NULL)
     {
         char input[INPUT_BUFFER_SIZE];
-        struct parser *parser = create_parser();
 
         printf("\nWelcome to the Adventure!\n\n");
         show_room(game->current_room);
@@ -42,7 +15,7 @@ void play_game(struct game *game)
             fgets(input, INPUT_BUFFER_SIZE, stdin);
             input[strlen(input) - 1] = '\0';
 
-            struct command *command = parse_input(parser, input);
+            struct command * command = parse_input(game->parser, input);
             if (command != NULL)
             {
                 printf("\n");
@@ -561,17 +534,25 @@ void execute_command(struct game *game, struct command *command)
             return;
         }
 
+        fseek(f, 0, SEEK_SET);
+
         game->backpack = destroy_backpack(game->backpack);
         game->backpack = create_backpack(BACKPACK_CAPACITY);
         game->world = destroy_world(game->world);
         game->world = create_world();
-        game->parser->history = destroy_containers(game->parser->history);
         game->current_room = game->world->room;
         game->state = PLAYING;
+        for(struct container * head = game->parser->history; head; head=head->next){
+            printf("History: %s\n", head->command->name);
+        }
+        game->parser = create_parser();
+        game->parser->history = destroy_containers(game->parser->history);
+        
 
         while ((read = getline(&line, &len, f)) != -1)
         {
             line[strlen(line) - 1] = '\0';
+            printf("%s\n", line);
 
             struct command *cmd = parse_input(game->parser, line);
             if (cmd)
@@ -581,9 +562,14 @@ void execute_command(struct game *game, struct command *command)
             }
         }
 
+        for(struct container * head = game->parser->history; head; head=head->next){
+            printf("History: %s\n", head->command->name);
+        }
+
         fclose(f);
 
         printf("Game loaded?\n");
+        return;
     }
 
     //-------------------------------------------------------------------------VERSION------------------------------

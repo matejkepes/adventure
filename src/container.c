@@ -51,6 +51,7 @@ struct container *destroy_containers(struct container *first)
 
         if (current->type == TYPE_COMMAND)
         {
+            printf("Destroying %s\n", current->command->name);
             destroy_command(current->command);
             current->command = NULL;
         }

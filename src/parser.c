@@ -61,8 +61,9 @@ struct parser *destroy_parser(struct parser *parser)
 {
     if (parser != NULL)
     {
-        destroy_containers(parser->commands);
-        destroy_containers(parser->history);
+        parser->commands = destroy_containers(parser->commands);
+        printf("HERE");
+        parser->history = destroy_containers(parser->history);
         parser = NULL;
     }
 
