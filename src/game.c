@@ -92,9 +92,9 @@ void execute_command(struct game *game, struct command *command)
         strcmp(command->name, "Take") == 0 ||
         strcmp(command->name, "Drop") == 0)
     {
-        buffer[0] ='\0';
+        buffer[0] = '\0';
         sprintf(buffer, "%s ", command->name);
-        
+
         for (int i = 0; i < command->nmatch; i++)
         {
             strcat(buffer, command->groups[i]);
@@ -121,8 +121,6 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't go there.\n");
             return;
         }
-
-        // add the executed command to the history log
     }
 
     //-------------------------------------------------------------------------SOUTH--------------------------------
@@ -134,12 +132,14 @@ void execute_command(struct game *game, struct command *command)
             struct room *room_to_go_to = game->current_room->south;
             game->current_room = room_to_go_to;
             show_room(game->current_room);
+            return;
         }
 
         if (game->current_room->south == NULL)
+        {
             printf("You can't go there.\n");
-
-        // add the executed command to the history log
+            return;
+        }
     }
 
     //-------------------------------------------------------------------------EAST---------------------------------
@@ -151,12 +151,14 @@ void execute_command(struct game *game, struct command *command)
             struct room *room_to_go_to = game->current_room->east;
             game->current_room = room_to_go_to;
             show_room(game->current_room);
+            return;
         }
 
         if (game->current_room->east == NULL)
+        {
             printf("You can't go there.\n");
-
-        // add the executed command to the history log
+            return;
+        }
     }
 
     //-------------------------------------------------------------------------WEST---------------------------------
@@ -168,12 +170,14 @@ void execute_command(struct game *game, struct command *command)
             struct room *room_to_go_to = game->current_room->west;
             game->current_room = room_to_go_to;
             show_room(game->current_room);
+            return;
         }
 
         if (game->current_room->west == NULL)
+        {
             printf("You can't go there.\n");
-
-        // add the executed command to the history log
+            return;
+        }
     }
 
     //-------------------------------------------------------------------------LOOK---------------------------------
