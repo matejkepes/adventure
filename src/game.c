@@ -1,11 +1,9 @@
 #include "game.h"
-
 void play_game(struct game *game)
 {
+    char input[INPUT_BUFFER_SIZE];
     if (game != NULL)
     {
-        char input[INPUT_BUFFER_SIZE];
-
         printf("\nWelcome to the Adventure!\n\n");
         show_room(game->current_room);
 
@@ -15,7 +13,7 @@ void play_game(struct game *game)
             fgets(input, INPUT_BUFFER_SIZE, stdin);
             input[strlen(input) - 1] = '\0';
 
-            struct command * command = parse_input(game->parser, input);
+            struct command *command = parse_input(game->parser, input);
             if (command != NULL)
             {
                 printf("\n");
@@ -84,6 +82,28 @@ void execute_command(struct game *game, struct command *command)
     if (game == NULL || command == NULL)
         return;
 
+    char buffer[100];
+
+    if (strcmp(command->name, "North") == 0 ||
+        strcmp(command->name, "South") == 0 ||
+        strcmp(command->name, "East") == 0 ||
+        strcmp(command->name, "West") == 0 ||
+        strcmp(command->name, "Use") == 0 ||
+        strcmp(command->name, "Take") == 0 ||
+        strcmp(command->name, "Drop") == 0)
+    {
+        buffer[0] ='\0';
+        sprintf(buffer, "%s ", command->name);
+        
+        for (int i = 0; i < command->nmatch; i++)
+        {
+            strcat(buffer, command->groups[i]);
+        }
+        printf("%s len: %d\n", command->name, strlen(buffer));
+
+        game->parser->history = create_container(game->parser->history, TYPE_TEXT, strdup(buffer));
+    }
+
     //-------------------------------------------------------------------------NORTH--------------------------------
 
     if (strcmp(command->name, "North") == 0)
@@ -103,7 +123,6 @@ void execute_command(struct game *game, struct command *command)
         }
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------SOUTH--------------------------------
@@ -121,7 +140,6 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't go there.\n");
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------EAST---------------------------------
@@ -139,7 +157,6 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't go there.\n");
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------WEST---------------------------------
@@ -157,7 +174,6 @@ void execute_command(struct game *game, struct command *command)
             printf("You can't go there.\n");
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------LOOK---------------------------------
@@ -209,7 +225,6 @@ void execute_command(struct game *game, struct command *command)
         printf("You have taken %s.\n", item_to_take->item->name);
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------DROP---------------------------------
@@ -240,7 +255,6 @@ void execute_command(struct game *game, struct command *command)
         printf("You have dropped %s.\n", item_to_drop->item->name);
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------USE----------------------------------
@@ -312,7 +326,6 @@ void execute_command(struct game *game, struct command *command)
         }
 
         // add the executed command to the history log
-        game->parser->history = create_container(game->parser->history, TYPE_COMMAND, command);
     }
 
     //-------------------------------------------------------------------------EXAMINE------------------------------
@@ -457,16 +470,6 @@ void execute_command(struct game *game, struct command *command)
 
     if (strcmp(command->name, "Save") == 0)
     {
-        /*       time_t timer;
-        char buffer[36];
-        struct tm *tm_info;
-
-        time(&timer);
-        tm_info = localtime(&timer);
-
-        strftime(buffer, 36, "saves/%Y%m%d%H%M%S.txt", tm_info); */
-
-        //   FILE *f = fopen(buffer, "w");
         FILE *f = fopen("saves/savegame.txt", "w");
         if (f == NULL)
         {
@@ -498,15 +501,8 @@ void execute_command(struct game *game, struct command *command)
             {
                 if (index == i)
                 {
-                    printf("Writing %s to file\n", head->command->name);
-
-                    fprintf(f, "%s", head->command->name);
-
-                    for (int i = 0; i < head->command->nmatch; i++)
-                    {
-                        fprintf(f, " %s", head->command->groups[i]);
-                    }
-
+                    printf("Writing %s\n", head->text);
+                    fprintf(f, "%s", head->text);
                     fprintf(f, "\n");
                 }
             }
@@ -542,12 +538,14 @@ void execute_command(struct game *game, struct command *command)
         game->world = create_world();
         game->current_room = game->world->room;
         game->state = PLAYING;
-        for(struct container * head = game->parser->history; head; head=head->next){
-            printf("History: %s\n", head->command->name);
+
+        for (struct container *head = game->parser->history; head; head = head->next)
+        {
+            printf("History: %s\n", head->text);
         }
+
+        game->parser = destroy_parser(game->parser);
         game->parser = create_parser();
-        game->parser->history = destroy_containers(game->parser->history);
-        
 
         while ((read = getline(&line, &len, f)) != -1)
         {
@@ -562,8 +560,9 @@ void execute_command(struct game *game, struct command *command)
             }
         }
 
-        for(struct container * head = game->parser->history; head; head=head->next){
-            printf("History: %s\n", head->command->name);
+        for (struct container *head = game->parser->history; head; head = head->next)
+        {
+            printf("History: %s\n", head->text);
         }
 
         fclose(f);
