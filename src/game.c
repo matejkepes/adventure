@@ -1,4 +1,5 @@
 #include "game.h"
+
 void play_game(struct game *game)
 {
     char input[INPUT_BUFFER_SIZE];
@@ -77,6 +78,213 @@ struct game *destroy_game(struct game *game)
     return NULL;
 }
 
+void travel(struct game *game, struct room *where_to)
+{
+
+    if (where_to != NULL)
+    {
+        struct room *room_to_go_to = where_to;
+        game->current_room = room_to_go_to;
+        show_room(game->current_room);
+    }
+
+    if (where_to == NULL)
+    {
+        printf("You can't go there.\n");
+        return;
+    }
+}
+
+void take(struct game *game, struct command *command)
+{
+    // check for matches
+    if (!command->groups[0])
+    {
+        printf("What do you want to take?\n");
+        return;
+    }
+
+    // find the item in the room
+    struct container *item_to_take = get_from_container_by_name(game->current_room->items, command->groups[0]);
+
+    // was the item found?
+    if (!item_to_take)
+    {
+        printf("There is no %s in this room.\n", command->groups[0]);
+        return;
+    }
+
+    // can you pick up the item?
+    if (!((item_to_take->item->properties & 0x0001) == 0x0001))
+    {
+        printf("%s cannot be picked up.\n", item_to_take->item->name);
+        return;
+    }
+
+    // is there enough room in your backpack?
+    if (game->backpack->size == game->backpack->capacity)
+    {
+        printf("There is not enough room in your backpack for the %s. You will have to drop something else first.\n", item_to_take->item->name);
+        return;
+    }
+
+    // take the item
+    game->backpack->items = create_container(game->backpack->items, TYPE_ITEM, item_to_take->item);
+    game->backpack->size++;
+    game->current_room->items = remove_container(game->current_room->items, item_to_take->item);
+    printf("You have taken %s.\n", item_to_take->item->name);
+}
+
+void drop(struct game *game, struct command *command)
+{
+    // check for matches
+    if (!command->groups[0])
+    {
+        printf("What do you want to drop?\n");
+        return;
+    }
+
+    // find the item in the backpack
+    struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups[0]);
+
+    // was the item found?
+    if (!item_to_drop)
+    {
+        printf("You don't have %s in your inventory to drop.\n", command->groups[0]);
+        return;
+    }
+
+    // drop the item
+    game->current_room->items = create_container(game->current_room->items, TYPE_ITEM, item_to_drop->item);
+    game->backpack->items = remove_container(game->backpack->items, item_to_drop->item);
+    game->backpack->size--;
+    printf("You have dropped %s.\n", item_to_drop->item->name);
+}
+
+void use(struct game *game, struct command *command)
+{
+    // check for matches
+    if (!command->groups[0])
+    {
+        printf("What do you want to use?\n");
+        return;
+    }
+
+    // find the item in the room or in the backpack
+    struct container *item_to_use_room = get_from_container_by_name(game->current_room->items, command->groups[0]);
+    struct container *item_to_use_backpack = get_from_container_by_name(game->backpack->items, command->groups[0]);
+    struct container *item_to_use;
+
+    // was the item found in the room?
+    if (item_to_use_room)
+        item_to_use = item_to_use_room;
+
+    // was the item found in the backpack?
+    if (item_to_use_backpack)
+        item_to_use = item_to_use_backpack;
+
+    // was the item not found?
+    if (!item_to_use)
+    {
+        printf("I can't see any %s.\n", command->groups[0]);
+        return;
+    }
+
+    // is the item usable?
+    if (!((item_to_use->item->properties & 0x0002) == 0x0002))
+    {
+        printf("You don't know how to use %s.\n", command->groups[0]);
+        return;
+    }
+
+    // use the item
+    // TODO: implement usability for each item in the game
+
+    // Golden watch will add the bling.
+    // Dusty bed will give you rest and allergies.
+    // The orb | use it in the last room to win the game.
+
+    if (strcmp(item_to_use->item->name, "Golden Watch") == 0)
+    {
+        printf("You can feel all the bling pouring over you as you put this watch on your wrist.\n");
+    }
+
+    if (strcmp(item_to_use->item->name, "Dusty Bed") == 0)
+    {
+        printf("You are refreshed after taking a nap in the dusty bed. For some reason, your nose is itching.\n");
+    }
+
+    if (strcmp(item_to_use->item->name, "The Orb") == 0)
+    {
+        if (strcmp(game->current_room->name, "Room O") != 0)
+            printf("You put your hand on the orb and notice a slight tingling sensation. The Orb lits up slightly. It's almost as if it was telling you to take it to the last room.\n");
+
+        if (strcmp(game->current_room->name, "Room O") == 0)
+        {
+            printf("You place your hand on the orb and it lits up the whole room, exposing a writing on the wall which says 'The End'.\n");
+            game->state = SOLVED;
+        }
+    }
+}
+
+void examine(struct game *game, struct command *command)
+{
+    // check for matches
+    if (!command->groups[0])
+    {
+        printf("What do you want to examine?\n");
+        return;
+    }
+
+    // find the item in the room or in the backpack
+    struct container *item_to_examine_room = get_from_container_by_name(game->current_room->items, command->groups[0]);
+    struct container *item_to_examine_backpack = get_from_container_by_name(game->backpack->items, command->groups[0]);
+    struct container *item_to_examine;
+
+    // was the item found in the room?
+    if (item_to_examine_room)
+        item_to_examine = item_to_examine_room;
+
+    // was the item found in the backpack?
+    if (item_to_examine_backpack)
+        item_to_examine = item_to_examine_backpack;
+
+    // was the item not found?
+    if (!item_to_examine)
+    {
+        printf("I can't see any %s.\n", command->groups[0]);
+        return;
+    }
+
+    // is the item examinable?
+    if (!((item_to_examine->item->properties & 0x0004) == 0x0004))
+    {
+        printf("There's nothing to say about %s.\n", item_to_examine->item->name);
+        return;
+    }
+    else
+    {
+        // examine the item
+        printf("%s.\n", item_to_examine->item->description);
+        return;
+    }
+}
+
+void show_inventory(struct game *game)
+{
+    // is the backpack empty?
+    if (game->backpack->size == 0)
+        printf("There are no items in your backpack.\n");
+
+    // display the items in your backpack
+    if (game->backpack->size > 0)
+    {
+        printf("These items are in your backpack:\n");
+        for (struct container *head = game->backpack->items; head; head = head->next)
+            printf("%s\n", head->item->name);
+    }
+}
+
 void execute_command(struct game *game, struct command *command)
 {
     if (game == NULL || command == NULL)
@@ -99,344 +307,97 @@ void execute_command(struct game *game, struct command *command)
         {
             strcat(buffer, command->groups[i]);
         }
-        printf("%s len: %d\n", command->name, strlen(buffer));
+
+        //printf("%s len: %d\n", command->name, strlen(buffer));
 
         game->parser->history = create_container(game->parser->history, TYPE_TEXT, strdup(buffer));
     }
 
     //-------------------------------------------------------------------------NORTH--------------------------------
-
-    if (strcmp(command->name, "North") == 0)
-    {
-
-        if (game->current_room->north != NULL)
-        {
-            struct room *room_to_go_to = game->current_room->north;
-            game->current_room = room_to_go_to;
-            show_room(game->current_room);
-        }
-
-        if (game->current_room->north == NULL)
-        {
-            printf("You can't go there.\n");
-            return;
-        }
-    }
-
     //-------------------------------------------------------------------------SOUTH--------------------------------
-
-    if (strcmp(command->name, "South") == 0)
-    {
-        if (game->current_room->south != NULL)
-        {
-            struct room *room_to_go_to = game->current_room->south;
-            game->current_room = room_to_go_to;
-            show_room(game->current_room);
-            return;
-        }
-
-        if (game->current_room->south == NULL)
-        {
-            printf("You can't go there.\n");
-            return;
-        }
-    }
-
     //-------------------------------------------------------------------------EAST---------------------------------
-
-    if (strcmp(command->name, "East") == 0)
-    {
-        if (game->current_room->east != NULL)
-        {
-            struct room *room_to_go_to = game->current_room->east;
-            game->current_room = room_to_go_to;
-            show_room(game->current_room);
-            return;
-        }
-
-        if (game->current_room->east == NULL)
-        {
-            printf("You can't go there.\n");
-            return;
-        }
-    }
-
     //-------------------------------------------------------------------------WEST---------------------------------
-
-    if (strcmp(command->name, "West") == 0)
-    {
-        if (game->current_room->west != NULL)
-        {
-            struct room *room_to_go_to = game->current_room->west;
-            game->current_room = room_to_go_to;
-            show_room(game->current_room);
-            return;
-        }
-
-        if (game->current_room->west == NULL)
-        {
-            printf("You can't go there.\n");
-            return;
-        }
-    }
-
     //-------------------------------------------------------------------------LOOK---------------------------------
-
-    if (strcmp(command->name, "Look") == 0)
-    {
-        show_room(game->current_room);
-    }
-
     //-------------------------------------------------------------------------TAKE---------------------------------
-
-    if (strcmp(command->name, "Take") == 0)
-    {
-        // check for matches
-        if (!command->groups[0])
-        {
-            printf("What do you want to take?\n");
-            return;
-        }
-
-        // find the item in the room
-        struct container *item_to_take = get_from_container_by_name(game->current_room->items, command->groups[0]);
-
-        // was the item found?
-        if (!item_to_take)
-        {
-            printf("There is no %s in this room.\n", command->groups[0]);
-            return;
-        }
-
-        // can you pick up the item?
-        if (!((item_to_take->item->properties & 0x0001) == 0x0001))
-        {
-            printf("%s cannot be picked up.\n", item_to_take->item->name);
-            return;
-        }
-
-        // is there enough room in your backpack?
-        if (game->backpack->size == game->backpack->capacity)
-        {
-            printf("There is not enough room in your backpack for the %s. You will have to drop something else first.\n", item_to_take->item->name);
-            return;
-        }
-
-        // take the item
-        game->backpack->items = create_container(game->backpack->items, TYPE_ITEM, item_to_take->item);
-        game->backpack->size++;
-        game->current_room->items = remove_container(game->current_room->items, item_to_take->item);
-        printf("You have taken %s.\n", item_to_take->item->name);
-
-        // add the executed command to the history log
-    }
-
     //-------------------------------------------------------------------------DROP---------------------------------
-
-    if (strcmp(command->name, "Drop") == 0)
-    {
-        // check for matches
-        if (!command->groups[0])
-        {
-            printf("What do you want to drop?\n");
-            return;
-        }
-
-        // find the item in the backpack
-        struct container *item_to_drop = get_from_container_by_name(game->backpack->items, command->groups[0]);
-
-        // was the item found?
-        if (!item_to_drop)
-        {
-            printf("You don't have %s in your inventory to drop.\n", command->groups[0]);
-            return;
-        }
-
-        // drop the item
-        game->current_room->items = create_container(game->current_room->items, TYPE_ITEM, item_to_drop->item);
-        game->backpack->items = remove_container(game->backpack->items, item_to_drop->item);
-        game->backpack->size--;
-        printf("You have dropped %s.\n", item_to_drop->item->name);
-
-        // add the executed command to the history log
-    }
-
     //-------------------------------------------------------------------------USE----------------------------------
-
-    if (strcmp(command->name, "Use") == 0)
-    {
-        // check for matches
-        if (!command->groups[0])
-        {
-            printf("What do you want to use?\n");
-            return;
-        }
-
-        // find the item in the room or in the backpack
-        struct container *item_to_use_room = get_from_container_by_name(game->current_room->items, command->groups[0]);
-        struct container *item_to_use_backpack = get_from_container_by_name(game->backpack->items, command->groups[0]);
-        struct container *item_to_use;
-
-        // was the item found in the room?
-        if (item_to_use_room)
-            item_to_use = item_to_use_room;
-        // TODO: pick up the item before using it?
-
-        // was the item found in the backpack?
-        if (item_to_use_backpack)
-            item_to_use = item_to_use_backpack;
-
-        // was the item not found?
-        if (!item_to_use)
-        {
-            printf("I can't see any %s.\n", command->groups[0]);
-            return;
-        }
-
-        // is the item usable?
-        if (!((item_to_use->item->properties & 0x0002) == 0x0002))
-        {
-            printf("You don't know how to use %s.\n", command->groups[0]);
-            return;
-        }
-
-        // use the item
-        // TODO: implement usability for each item in the game
-
-        // Golden watch will add the bling.
-        // Dusty bed will give you rest and allergies.
-        // The orb | use it in the last room to win the game.
-
-        if (strcmp(item_to_use->item->name, "Golden Watch") == 0)
-        {
-            printf("You can feel all the bling pouring over you as you put this watch on your wrist.\n");
-        }
-
-        if (strcmp(item_to_use->item->name, "Dusty Bed") == 0)
-        {
-            printf("You are refreshed after taking a nap in the dusty bed. For some reason, your nose is itching.\n");
-        }
-
-        if (strcmp(item_to_use->item->name, "The Orb") == 0)
-        {
-            if (strcmp(game->current_room->name, "Room O") != 0)
-                printf("You put your hand on the orb and notice a slight tingling sensation. The Orb lits up slightly. It's almost as if it was telling you to take it to the last room.\n");
-
-            if (strcmp(game->current_room->name, "Room O") == 0)
-            {
-                printf("You place your hand on the orb and it lits up the whole room, exposing a writing on the wall which says 'The End'.\n");
-                game->state = SOLVED;
-            }
-        }
-
-        // add the executed command to the history log
-    }
-
     //-------------------------------------------------------------------------EXAMINE------------------------------
-
-    if (strcmp(command->name, "Examine") == 0)
-    {
-        // check for matches
-        if (!command->groups[0])
-        {
-            printf("What do you want to examine?\n");
-            return;
-        }
-
-        // find the item in the room or in the backpack
-        struct container *item_to_examine_room = get_from_container_by_name(game->current_room->items, command->groups[0]);
-        struct container *item_to_examine_backpack = get_from_container_by_name(game->backpack->items, command->groups[0]);
-        struct container *item_to_examine;
-
-        // was the item found in the room?
-        if (item_to_examine_room)
-            item_to_examine = item_to_examine_room;
-
-        // was the item found in the backpack?
-        if (item_to_examine_backpack)
-            item_to_examine = item_to_examine_backpack;
-
-        // was the item not found?
-        if (!item_to_examine)
-        {
-            printf("I can't see any %s.\n", command->groups[0]);
-            return;
-        }
-
-        // is the item examinable?
-        if (!((item_to_examine->item->properties & 0x0004) == 0x0004))
-        {
-            printf("There's nothing to say about %s.\n", item_to_examine->item->name);
-            return;
-        }
-        else
-        {
-            // examine the item
-            printf("%s.\n", item_to_examine->item->description);
-            return;
-        }
-    }
-
     //-------------------------------------------------------------------------INVENTORY----------------------------
-
-    if (strcmp(command->name, "Inventory") == 0)
-    {
-        // is the backpack empty?
-        if (game->backpack->size == 0)
-            printf("There are no items in your backpack.\n");
-
-        // display the items in your backpack
-        if (game->backpack->size > 0)
-        {
-            printf("These items are in your backpack:\n");
-            for (struct container *head = game->backpack->items; head; head = head->next)
-                printf("%s\n", head->item->name);
-        }
-    }
-
     //-------------------------------------------------------------------------RESTART------------------------------
 
-    if (strcmp(command->name, "Restart") == 0)
+    if (strcmp(command->name, "North") == 0)
+        travel(game, game->current_room->north);
+
+    else if (strcmp(command->name, "South") == 0)
+        travel(game, game->current_room->south);
+
+    else if (strcmp(command->name, "East") == 0)
+        travel(game, game->current_room->east);
+
+    else if (strcmp(command->name, "West") == 0)
+        travel(game, game->current_room->west);
+
+    else if (strcmp(command->name, "Look") == 0)
+        show_room(game->current_room);
+
+    else if (strcmp(command->name, "Take") == 0)
+        take(game, command);
+
+    else if (strcmp(command->name, "Drop") == 0)
+        drop(game, command);
+
+    else if (strcmp(command->name, "Use") == 0)
+        use(game, command);
+
+    else if (strcmp(command->name, "Examine") == 0)
+        examine(game, command);
+
+    else if (strcmp(command->name, "Inventory") == 0)
+        show_inventory(game);
+
+    else if (strcmp(command->name, "Restart") == 0)
     {
-        char input[4];
+        char input[20];
 
-        printf("Are you sure you want to restart the game? All progress will be lost.\n");
+        printf("Are you sure you want to restart the game? All progress will be lost.\n\n> ");
 
-        fgets(input, 4, stdin);
+        fgets(input, 20, stdin);
         input[strlen(input) - 1] = '\0';
 
+        printf("HERE1\n");
         regex_t yes_reg;
         regex_t no_reg;
+        printf("HERE2\n");
 
         int result =
             regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) &&
             regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
-
-        if (result == 1)
+        printf("HERE3\n");
+        if (result != 0)
             exit(1);
-
+        printf("HERE4\n");
         int yes = regexec(&yes_reg, input, 0, NULL, 0);
         int no = regexec(&no_reg, input, 0, NULL, 0);
-
-        if (yes && no)
+        printf("HERE5\n");
+        if (yes != 0 && no != 0)
         {
             printf("I didn't understand that.\n");
             return;
         }
 
-        if (!yes)
+        if (yes == 0)
             game->state = RESTART;
 
-        if (!no)
+        if (no == 0)
         {
             printf("Okay.\n");
             return;
         }
     }
 
-    //-------------------------------------------------------------------------QUIT---------------------------------
+    //------------------------------------------------------------------------QUIT---------------------------------
 
-    if (strcmp(command->name, "Quit") == 0)
+    else if (strcmp(command->name, "Quit") == 0)
     {
         char input[20];
 
@@ -472,7 +433,7 @@ void execute_command(struct game *game, struct command *command)
 
     //-------------------------------------------------------------------------SAVE---------------------------------
 
-    if (strcmp(command->name, "Save") == 0)
+    else if (strcmp(command->name, "Save") == 0)
     {
         FILE *f = fopen("saves/savegame.txt", "w");
         if (f == NULL)
@@ -480,8 +441,6 @@ void execute_command(struct game *game, struct command *command)
             printf("Error opening file!\n");
             return;
         }
-
-        //########################################################################
 
         struct container *cmd_current = game->parser->history;
         struct container *cmd_hold_next = NULL;
@@ -521,7 +480,7 @@ void execute_command(struct game *game, struct command *command)
 
     //-------------------------------------------------------------------------LOAD---------------------------------
 
-    if (strcmp(command->name, "Load") == 0)
+    else if (strcmp(command->name, "Load") == 0)
     {
         char *line = NULL;
         size_t len = 0;
@@ -577,22 +536,26 @@ void execute_command(struct game *game, struct command *command)
 
     //-------------------------------------------------------------------------VERSION------------------------------
 
-    if (strcmp(command->name, "Version") == 0)
+    else if (strcmp(command->name, "Version") == 0)
     {
         printf("This is the best version. by Matej and Veronika.\n");
+        return;
     }
 
     //-------------------------------------------------------------------------ABOUT--------------------------------
 
-    if (strcmp(command->name, "About") == 0)
+    else if (strcmp(command->name, "About") == 0)
     {
         printf("This game is very nice.\n");
+        return;
     }
 
     //-------------------------------------------------------------------------HELP---------------------------------
 
-    if (strcmp(command->name, "Help") == 0)
+    else if (strcmp(command->name, "Help") == 0)
     {
         printf("I don't want to help you. Sorry.\n");
+        return;
     }
+
 }

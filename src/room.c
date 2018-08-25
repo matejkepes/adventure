@@ -61,7 +61,7 @@ void show_room(const struct room *room)
         printf("%s\n", room->description);
 
         if (room->items == NULL)
-            printf("You can't see any items in this room.\n");
+            printf("\nYou can't see any items in this room.\n");
         else
         {
             printf("\nYou see:\n");

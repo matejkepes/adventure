@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <regex.h>
 
 /// Max. size of input buffer (line)
 #define INPUT_BUFFER_SIZE 100

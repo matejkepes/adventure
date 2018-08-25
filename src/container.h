@@ -6,6 +6,7 @@
 #include "room.h"
 #include "item.h"
 #include "command.h"
+#include <stdio.h>
 
 /**
  * Container type
