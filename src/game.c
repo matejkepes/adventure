@@ -78,6 +78,7 @@ struct game *destroy_game(struct game *game)
     return NULL;
 }
 
+//-------------------------------------------------------------------------TRAVEL--------------------------------
 void travel(struct game *game, struct room *where_to)
 {
 
@@ -95,6 +96,7 @@ void travel(struct game *game, struct room *where_to)
     }
 }
 
+//-------------------------------------------------------------------------TAKE---------------------------------
 void take(struct game *game, struct command *command)
 {
     // check for matches
@@ -135,6 +137,7 @@ void take(struct game *game, struct command *command)
     printf("You have taken %s.\n", item_to_take->item->name);
 }
 
+//-------------------------------------------------------------------------DROP---------------------------------
 void drop(struct game *game, struct command *command)
 {
     // check for matches
@@ -161,6 +164,7 @@ void drop(struct game *game, struct command *command)
     printf("You have dropped %s.\n", item_to_drop->item->name);
 }
 
+//-------------------------------------------------------------------------USE----------------------------------
 void use(struct game *game, struct command *command)
 {
     // check for matches
@@ -227,6 +231,7 @@ void use(struct game *game, struct command *command)
     }
 }
 
+//-------------------------------------------------------------------------EXAMINE------------------------------
 void examine(struct game *game, struct command *command)
 {
     // check for matches
@@ -270,6 +275,7 @@ void examine(struct game *game, struct command *command)
     }
 }
 
+//-------------------------------------------------------------------------INVENTORY----------------------------
 void show_inventory(struct game *game)
 {
     // is the backpack empty?
@@ -285,6 +291,159 @@ void show_inventory(struct game *game)
     }
 }
 
+//-------------------------------------------------------------------------RESTART & QUIT------------------------------
+void restart_or_quit_game(struct game *game, int flag)
+{
+    // flag = 1 for restart
+    // flag = 2 for quit
+
+    char input[20];
+
+    printf("Are you sure you want to restart the game? All progress will be lost.\n\n> ");
+
+    fgets(input, 20, stdin);
+    input[strlen(input) - 1] = '\0';
+
+    regex_t yes_reg;
+    regex_t no_reg;
+
+    int result =
+        regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) |
+        regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
+
+    if (result != 0)
+        exit(1);
+
+    int yes = regexec(&yes_reg, input, 0, NULL, 0);
+    int no = regexec(&no_reg, input, 0, NULL, 0);
+
+    if (yes != 0 && no != 0)
+    {
+        printf("\nI didn't understand that.\n");
+        return;
+    }
+
+    if (yes == 0)
+        if (flag == 1)
+            game->state = RESTART;
+
+        else if (flag == 2)
+        {
+            printf("\nGoodbye.\n");
+            game->state = GAMEOVER;
+        }
+
+    if (no == 0)
+    {
+        printf("\nOkay.\n");
+        return;
+    }
+}
+
+//-------------------------------------------------------------------------SAVE---------------------------------
+void save_game(struct game *game)
+{
+    FILE *f = fopen("saves/savegame.txt", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    struct container *cmd_current = game->parser->history;
+    struct container *cmd_hold_next = NULL;
+
+    int commands_in_history = 0;
+
+    for (; cmd_current; cmd_current = cmd_current->next)
+        commands_in_history++;
+
+    if (commands_in_history == 0)
+    {
+        printf("Nothing to save\n");
+        return;
+    }
+
+    for (int i = commands_in_history; i > 0; --i)
+    {
+        struct container *head = game->parser->history;
+
+        for (int index = 1; head != NULL; head = head->next, index++)
+        {
+            if (index == i)
+            {
+                //printf("Writing %s\n", head->text);
+                fprintf(f, "%s", head->text);
+                fprintf(f, "\n");
+            }
+        }
+    }
+
+    fclose(f);
+    f = NULL;
+
+    printf("Game saved.\n");
+    return;
+}
+
+//-------------------------------------------------------------------------LOAD---------------------------------
+void load_game(struct game *game)
+{
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    FILE *f = fopen("saves/savegame.txt", "r");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    fseek(f, 0, SEEK_SET);
+
+    game->backpack = destroy_backpack(game->backpack);
+    game->backpack = create_backpack(BACKPACK_CAPACITY);
+    game->world = destroy_world(game->world);
+    game->world = create_world();
+    game->current_room = game->world->room;
+    game->state = PLAYING;
+
+    /*     for (struct container *head = game->parser->history; head; head = head->next)
+    {
+        printf("History: %s\n", head->text);
+    } */
+
+    game->parser = destroy_parser(game->parser);
+    game->parser = create_parser();
+
+    while ((read = getline(&line, &len, f)) != -1)
+    {
+        line[strlen(line) - 1] = '\0';
+        printf("%s\n", line);
+
+        struct command *cmd = parse_input(game->parser, line);
+        if (cmd)
+        {
+            //printf("Command to execute: %s\n", cmd->name);
+            execute_command(game, cmd);
+        }
+    }
+
+    printf("\nHistory:\n");
+
+    for (struct container *head = game->parser->history; head; head = head->next)
+    {
+        printf("%s\n", head->text);
+    }
+
+    fclose(f);
+
+    printf("\nGame loaded.\n");
+    return;
+}
+
+//-------------------------------------------------------------------------EXECUTE COMMAND------------------
 void execute_command(struct game *game, struct command *command)
 {
     if (game == NULL || command == NULL)
@@ -312,18 +471,6 @@ void execute_command(struct game *game, struct command *command)
 
         game->parser->history = create_container(game->parser->history, TYPE_TEXT, strdup(buffer));
     }
-
-    //-------------------------------------------------------------------------NORTH--------------------------------
-    //-------------------------------------------------------------------------SOUTH--------------------------------
-    //-------------------------------------------------------------------------EAST---------------------------------
-    //-------------------------------------------------------------------------WEST---------------------------------
-    //-------------------------------------------------------------------------LOOK---------------------------------
-    //-------------------------------------------------------------------------TAKE---------------------------------
-    //-------------------------------------------------------------------------DROP---------------------------------
-    //-------------------------------------------------------------------------USE----------------------------------
-    //-------------------------------------------------------------------------EXAMINE------------------------------
-    //-------------------------------------------------------------------------INVENTORY----------------------------
-    //-------------------------------------------------------------------------RESTART------------------------------
 
     if (strcmp(command->name, "North") == 0)
         travel(game, game->current_room->north);
@@ -356,183 +503,16 @@ void execute_command(struct game *game, struct command *command)
         show_inventory(game);
 
     else if (strcmp(command->name, "Restart") == 0)
-    {
-        char input[20];
-
-        printf("Are you sure you want to restart the game? All progress will be lost.\n\n> ");
-
-        fgets(input, 20, stdin);
-        input[strlen(input) - 1] = '\0';
-
-        printf("HERE1\n");
-        regex_t yes_reg;
-        regex_t no_reg;
-        printf("HERE2\n");
-
-        int result =
-            regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) &&
-            regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
-        printf("HERE3\n");
-        if (result != 0)
-            exit(1);
-        printf("HERE4\n");
-        int yes = regexec(&yes_reg, input, 0, NULL, 0);
-        int no = regexec(&no_reg, input, 0, NULL, 0);
-        printf("HERE5\n");
-        if (yes != 0 && no != 0)
-        {
-            printf("I didn't understand that.\n");
-            return;
-        }
-
-        if (yes == 0)
-            game->state = RESTART;
-
-        if (no == 0)
-        {
-            printf("Okay.\n");
-            return;
-        }
-    }
-
-    //------------------------------------------------------------------------QUIT---------------------------------
+        restart_or_quit_game(game, 1);
 
     else if (strcmp(command->name, "Quit") == 0)
-    {
-        char input[20];
-
-        printf("Are you sure you want to quit the game? All progress will be lost.\n");
-
-        scanf("%s", input);
-
-        regex_t yes_reg;
-        regex_t no_reg;
-
-        int result =
-            regcomp(&yes_reg, "\\ *(y|yes|yep|yeah)\\ *$", REG_ICASE | REG_EXTENDED) &&
-            regcomp(&no_reg, "\\ *(n|no|nope|nah)\\ *$", REG_ICASE | REG_EXTENDED);
-
-        if (result == 1)
-            exit(1);
-
-        int yes = regexec(&yes_reg, input, 0, NULL, 0);
-        int no = regexec(&no_reg, input, 0, NULL, 0);
-
-        if (yes && no)
-            printf("I didn't understand that.\n");
-
-        if (!yes)
-        {
-            printf("Goodbye.\n");
-            game->state = GAMEOVER;
-        }
-
-        if (!no)
-            printf("Okay.\n");
-    }
-
-    //-------------------------------------------------------------------------SAVE---------------------------------
+        restart_or_quit_game(game, 2);
 
     else if (strcmp(command->name, "Save") == 0)
-    {
-        FILE *f = fopen("saves/savegame.txt", "w");
-        if (f == NULL)
-        {
-            printf("Error opening file!\n");
-            return;
-        }
-
-        struct container *cmd_current = game->parser->history;
-        struct container *cmd_hold_next = NULL;
-
-        int commands_in_history = 0;
-
-        for (; cmd_current; cmd_current = cmd_current->next)
-            commands_in_history++;
-
-        if (commands_in_history == 0)
-        {
-            printf("Nothing to save\n");
-            return;
-        }
-
-        for (int i = commands_in_history; i > 0; --i)
-        {
-            struct container *head = game->parser->history;
-
-            for (int index = 1; head != NULL; head = head->next, index++)
-            {
-                if (index == i)
-                {
-                    printf("Writing %s\n", head->text);
-                    fprintf(f, "%s", head->text);
-                    fprintf(f, "\n");
-                }
-            }
-        }
-
-        fclose(f);
-        f = NULL;
-
-        printf("Game saved.\n");
-        return;
-    }
-
-    //-------------------------------------------------------------------------LOAD---------------------------------
+        save_game(game);
 
     else if (strcmp(command->name, "Load") == 0)
-    {
-        char *line = NULL;
-        size_t len = 0;
-        ssize_t read;
-
-        FILE *f = fopen("saves/savegame.txt", "r");
-        if (f == NULL)
-        {
-            printf("Error opening file!\n");
-            return;
-        }
-
-        fseek(f, 0, SEEK_SET);
-
-        game->backpack = destroy_backpack(game->backpack);
-        game->backpack = create_backpack(BACKPACK_CAPACITY);
-        game->world = destroy_world(game->world);
-        game->world = create_world();
-        game->current_room = game->world->room;
-        game->state = PLAYING;
-
-        for (struct container *head = game->parser->history; head; head = head->next)
-        {
-            printf("History: %s\n", head->text);
-        }
-
-        game->parser = destroy_parser(game->parser);
-        game->parser = create_parser();
-
-        while ((read = getline(&line, &len, f)) != -1)
-        {
-            line[strlen(line) - 1] = '\0';
-            printf("%s\n", line);
-
-            struct command *cmd = parse_input(game->parser, line);
-            if (cmd)
-            {
-                printf("Command to execute: %s\n", cmd->name);
-                execute_command(game, cmd);
-            }
-        }
-
-        for (struct container *head = game->parser->history; head; head = head->next)
-        {
-            printf("History: %s\n", head->text);
-        }
-
-        fclose(f);
-
-        printf("Game loaded?\n");
-        return;
-    }
+        load_game(game);
 
     //-------------------------------------------------------------------------VERSION------------------------------
 
@@ -557,5 +537,4 @@ void execute_command(struct game *game, struct command *command)
         printf("I don't want to help you. Sorry.\n");
         return;
     }
-
 }
