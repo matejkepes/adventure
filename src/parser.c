@@ -9,26 +9,26 @@ struct parser *create_parser()
 
     if (parser != NULL)
     {
-        COMMAND *north = create_command("North", "FILL IN DESC", "^\\ *(north|n)\\ *$", 0);
-        COMMAND *south = create_command("South", "FILL IN DESC", "^\\ *(south|s)\\ *$", 0);
-        COMMAND *east = create_command("East", "FILL IN DESC", "^\\ *(east|s)\\ *$", 0);
-        COMMAND *west = create_command("West", "FILL IN DESC", "^\\ *(west|s)\\ *$", 0);
-        COMMAND *look = create_command("Look", "FILL IN DESC", "^\\ *look\\ *$", 0);
+        COMMAND *north = create_command("North", "Takes your character to the north.", "^\\ *(north|n)\\ *$", 0);
+        COMMAND *south = create_command("South", "Takes your character to the south.", "^\\ *(south|s)\\ *$", 0);
+        COMMAND *east = create_command("East", "Takes your character to the east.", "^\\ *(east|s)\\ *$", 0);
+        COMMAND *west = create_command("West", "Takes your character to the west.", "^\\ *(west|s)\\ *$", 0);
+        COMMAND *look = create_command("Look", "Gives you a full description of your location.", "^\\ *(look|l)\\ *$", 0);
 
-        COMMAND *take = create_command("Take", "FILL IN DESC", "^\\ *take\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
-        COMMAND *drop = create_command("Drop", "FILL IN DESC", "^\\ *drop\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
-        COMMAND *use = create_command("Use", "FILL IN DESC", "^\\ *use\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
-        COMMAND *examine = create_command("Examine", "FILL IN DESC", "^\\ *examine\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
+        COMMAND *take = create_command("Take", "Puts the specified item from the current room into your backpack.", "^\\ *(take|t)\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
+        COMMAND *drop = create_command("Drop", "Drops the specified item from your backpack into the current room.", "^\\ *(drop|d)\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
+        COMMAND *use = create_command("Use", "Uses the specified item.", "^\\ *(use|u)\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
+        COMMAND *examine = create_command("Examine", "Gives you a full description of the specified item.", "^\\ *(examine|e)\\ +([a-z0-9][a-z0-9\\ ]*[a-z0-9])\\ *$", 1);
 
-        COMMAND *inventory = create_command("Inventory", "FILL IN DESC", "^\\ *(inventory|i)\\ *$", 0);
+        COMMAND *inventory = create_command("Inventory", "Shows you the items you are currently holding in your backpack.", "^\\ *(inventory|i)\\ *$", 0);
 
-        COMMAND *restart = create_command("Restart", "FILL IN DESC", "^\\ *restart\\ *$", 0);
-        COMMAND *quit = create_command("Quit", "FILL IN DESC", "^\\ *(quit|exit|q)\\ *$", 0);
-        COMMAND *load = create_command("Load", "FILL IN DESC", "^\\ *load\\ *$", 0);
-        COMMAND *save = create_command("Save", "FILL IN DESC", "^\\ *save\\ *$", 0);
-        COMMAND *version = create_command("Version", "FILL IN DESC", "^\\ *version\\ *$", 0);
-        COMMAND *about = create_command("About", "FILL IN DESC", "^\\ *about\\ *$", 0);
-        COMMAND *help = create_command("Help", "FILL IN DESC", "^\\ *(help|h)\\ *$", 0);
+        COMMAND *restart = create_command("Restart", "Starts the story over from the beginning.", "^\\ *(restart|r)\\ *$", 0);
+        COMMAND *quit = create_command("Quit", "Quits the game. Make sure to save your game before quitting.", "^\\ *(quit|exit|q)\\ *$", 0);
+        COMMAND *load = create_command("Load", "Loads the most recently saved game.", "^\\ *(load|restore)\\ *$", 0);
+        COMMAND *save = create_command("Save", "Saves the game. You can return to the game by using the LOAD command.", "^\\ *save\\ *$", 0);
+        COMMAND *version = create_command("Version", "Tells you the version of the game.", "^\\ *version\\ *$", 0);
+        COMMAND *about = create_command("About", "Tells you about the story of the game.", "^\\ *about\\ *$", 0);
+        COMMAND *help = create_command("Help", "Gives you a list of all available commands.", "^\\ *(help|h)\\ *$", 0);
 
         struct container *commands = create_container(NULL, TYPE_COMMAND, north);
         commands = create_container(commands, TYPE_COMMAND, south);

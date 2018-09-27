@@ -30,6 +30,7 @@ void play_game(struct game *game)
         if (game->state == GAMEOVER)
         {
             game = destroy_game(game);
+            exit(0);
         }
 
         if (game->state == RESTART)
@@ -299,7 +300,10 @@ void restart_or_quit_game(struct game *game, int flag)
 
     char input[20];
 
-    printf("Are you sure you want to restart the game? All progress will be lost.\n\n> ");
+    if (flag == 1)
+        printf("Are you sure you want to restart the game? All progress will be lost.\n\n> ");
+    else if (flag == 2)
+        printf("Are you sure you want to quit the game? All progress will be lost.\n\n> ");
 
     fgets(input, 20, stdin);
     input[strlen(input) - 1] = '\0';
@@ -329,7 +333,7 @@ void restart_or_quit_game(struct game *game, int flag)
 
         else if (flag == 2)
         {
-            printf("\nGoodbye.\n");
+            printf("\nGoodbye.\n\n");
             game->state = GAMEOVER;
         }
 
@@ -534,7 +538,8 @@ void execute_command(struct game *game, struct command *command)
 
     else if (strcmp(command->name, "Help") == 0)
     {
-        printf("I don't want to help you. Sorry.\n");
-        return;
+        for (struct container *head = game->parser->commands; head; head = head->next){
+            printf("%-10s | %s\n", head->command->name, head->command->description);
+        }
     }
 }
